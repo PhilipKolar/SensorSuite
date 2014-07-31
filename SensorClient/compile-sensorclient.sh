@@ -1,0 +1,2 @@
+gmcs -r:../packages/Raspberry.IO.GeneralPurpose.2.0.1/lib/net40/Raspberry.IO.GeneralPurpose.dll -r:../packages/Raspberry.System.1.2.0/lib/net40/Raspberry.System.dll *.cs ../WSNUtil/*.cs
+mv Program.exe ./bin/Debug/Program.exe
