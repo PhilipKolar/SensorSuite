@@ -1,9 +1,0 @@
-**I2**
-
-Straight Horizontal : (-155, -37) to (158, -37), 8 sec duration, 27/07/2014 4:13:50s
-Straight Diagonal : (-127, -142) to (187, 207), 17 sec, 27/07/2014 4:23:45s
-Curve : (-127, -142,) to (197, 141), radius = 324cm, 13 sec duration, 27/07/2014 4:32:00s
-Sharp Turn : Start (-79, 178) to (-79, 20). Turn to (25, -50) with radius 70, continue to (140, -50). 14.5 sec duration , 27/07/2014 4:41:45s
-Loop : Start (-36, 141) to (-36, -20). Make two circles/loops turning rightward with radius 95.5cm, continue straight to (-42, 162). 31.5 duration, 27/07/2014 4:59:00s
-
-(Don't do zigzag or straight vertical)

@@ -32,6 +32,11 @@ namespace WSNUtil
             }
         }
 
+        public static string GetDisplayServerResultFolder(string iniFile)
+        {
+            return ConfigFileParser.RetrieveString("RESULT_OUTPUT_FOLDER", iniFile);
+        }
+
         public static int GetSensorClientBuzzerPin(string iniFile)
         {
             return ConfigFileParser.RetrieveInt("SENSOR_CLIENT_BUZZER_PIN", iniFile);

@@ -1,9 +1,0 @@
-**I2**
-
-Straight Horizontal : (-155, -37) to (158, -37) 8 sec duration, 27/07/2014 4:13:50s
-Straight Diagonal : (-127, -142) to (187, 207) 17 sec, 27/07/2014 4:23:45s
-Curve
-Sharp Turn
-Loop
-
-(Don't do zigzag or straight vertical)

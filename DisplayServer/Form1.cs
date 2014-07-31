@@ -14,17 +14,28 @@ namespace DisplayServer
 {
     public partial class frmDisplayServer : Form
     {
-        public frmDisplayServer()
-        {
-            InitializeComponent();
-        }
-
+        private static string INIFile = Variables.DefaultINILocation;
+        private static string CSVFile = Variables.DefaultCSVLocation;
         private int CurrImageID = 0;
         private Mutex DrawingMutex = new Mutex();
         private int MessageCount = 0;
         private StateDrawer Drawer;
-        private string FolderPath = @"Experiment";
+        private string FolderPath; // For image and CSV result output
         const string STATE_HISTORY_FILENAME = "StateHistory.csv";
+
+        public frmDisplayServer()
+        {
+            InitializeComponent();
+            try
+            {
+                FolderPath = Variables.GetDisplayServerResultFolder(INIFile);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Fatal error retrieving configuration information from INIFile: '{0}'", ex.Message);
+                Environment.Exit(1);
+            }
+        }
 
         public void MessageReceived(List<ObjectEstimate> rawData, List<ObjectEstimate> stateEstimate)
         {
@@ -33,7 +44,7 @@ namespace DisplayServer
             DrawingMutex.WaitOne();
 
             if (Drawer == null)
-                Drawer = new StateDrawer(rawData, stateEstimate, picCurrState.Width, picCurrState.Height, Variables.DefaultCSVLocation);
+                Drawer = new StateDrawer(rawData, stateEstimate, picCurrState.Width, picCurrState.Height, CSVFile);
             else
                 Drawer.SetStates(rawData, stateEstimate);
             Bitmap Bmp = Drawer.DrawState();
@@ -92,7 +103,7 @@ namespace DisplayServer
 
         private void Init_Form()
         {
-            DisplayReceiver Receiver = new DisplayReceiver(Variables.DefaultINILocation, lblDebugInfo);
+            DisplayReceiver Receiver = new DisplayReceiver(INIFile, lblDebugInfo);
             Receiver.OnMessageReceived += MessageReceived;
             FolderPath = GetFolderPath(FolderPath); //Update the FolderPath value to not overwrite previous runs
             InitStateHistoryFile();
@@ -102,9 +113,9 @@ namespace DisplayServer
             lblMessageCount.Invoke((MethodInvoker)(() => lblMessageCount.Text = "0"));
             lblStatus.Invoke((MethodInvoker)(() => lblStatus.Text = "Connected"));
             lblStatus.Invoke((MethodInvoker)(() => lblStatus.ForeColor = Color.Green));
-            int PollingDelay = Variables.GetPollingDelay(Variables.DefaultINILocation);
+            int PollingDelay = Variables.GetPollingDelay(INIFile);
             lblPollingFrequency.Invoke((MethodInvoker)(() => lblPollingFrequency.Text = string.Format("{0} Hz ({1} ms per measurement)", 1000 / PollingDelay, PollingDelay)));
-            lblServerIP.Invoke((MethodInvoker)(() => lblServerIP.Text = string.Format("{0}:{1}", Receiver.ClientIP, Variables.GetDisplayPort(Variables.DefaultINILocation))));
+            lblServerIP.Invoke((MethodInvoker)(() => lblServerIP.Text = string.Format("{0}:{1}", Receiver.ClientIP, Variables.GetDisplayPort(INIFile))));
         }
 
         private void InitStateHistoryFile()
