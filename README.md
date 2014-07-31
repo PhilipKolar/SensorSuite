@@ -13,7 +13,7 @@ This repository contains suite of .NET programs to operate a distributed sensor 
 
 **SensorClient Deployment bash script**
 ===========
-    IP="10.1.1.68"
+    IP="YourSensorServerIP"
 
     echo -n 'Deleting existing files... '
     sshpass -p YourPassword ssh pi@$IP "rm -r ~/BaselineSolutionSCP"
