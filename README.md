@@ -11,7 +11,7 @@ This repository contains suite of .NET programs to operate a distributed sensor 
 
 * DisplayServer - Draws the state based on the sensor CSV data as well as the aggregated information from the SensorServer. Unlike the other two applications the DisplayServer provides a GUI by use of WinForms.
 
-*SensorClient Deployment bash script*
+**SensorClient Deployment bash script**
 ===========
     IP="YourSensorServerIP"
 
