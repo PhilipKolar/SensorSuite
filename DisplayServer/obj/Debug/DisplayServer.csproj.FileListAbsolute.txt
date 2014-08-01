@@ -28,13 +28,3 @@ C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\BaselineSolution\Disp
 C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\BaselineSolution\DisplayServer\obj\Debug\DisplayServer.csproj.GenerateResource.Cache
 C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\BaselineSolution\DisplayServer\obj\Debug\DisplayServer.exe
 C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\BaselineSolution\DisplayServer\obj\Debug\DisplayServer.pdb
-C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\DisplayServer\obj\Debug\DisplayServer.exe
-C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\DisplayServer\obj\Debug\DisplayServer.pdb
-C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\DisplayServer\bin\Debug\DisplayServer.exe
-C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\DisplayServer\bin\Debug\DisplayServer.pdb
-C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\DisplayServer\bin\Debug\WSNUtil.dll
-C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\DisplayServer\bin\Debug\WSNUtil.pdb
-C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\DisplayServer\obj\Debug\DisplayServer.csprojResolveAssemblyReference.cache
-C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\DisplayServer\obj\Debug\DisplayServer.frmDisplayServer.resources
-C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\DisplayServer\obj\Debug\DisplayServer.Properties.Resources.resources
-C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\DisplayServer\obj\Debug\DisplayServer.csproj.GenerateResource.Cache
