@@ -9,7 +9,7 @@ namespace SensorClient.Schedulers
     {
         string CSVFile { get; }
         string INIFile { get; }
-        void SendData();
+        void Start();
         void Close();
     }
 }

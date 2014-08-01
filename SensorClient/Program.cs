@@ -36,13 +36,21 @@ namespace SensorClient
                     return;
                 int SensorID = int.Parse(args[0]);
                 bool TimeDivision = Variables.GetSensorClientTimeDivison(INIFile);
-                Scheduler = new RealDataScheduler(INIFile, CSVFile, SensorID, TimeDivision);
-                Scheduler.SendData();
+                try
+                {
+                    Scheduler = new RealDataScheduler(INIFile, CSVFile, SensorID, TimeDivision);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Fatal error encountered: '{0}'", ex.Message);
+                    return;
+                }
+                Scheduler.Start();
                 int BuzzerPin = Variables.GetSensorClientBuzzerPin(INIFile);
                 if (BuzzerPin > 0)
                 {
-                    PiezoBuzzer Buzzer = new PiezoBuzzer(BuzzerPin, Variables.GetSensorClientBuzzerTimeOn(INIFile),
-                        Variables.GetSensorClientBuzzerTimeOff(INIFile));
+                    PiezoBuzzer Buzzer = new PiezoBuzzer(BuzzerPin, Variables.GetSensorClientBuzzerTimeOn_ms(INIFile),
+                        Variables.GetSensorClientBuzzerTimeOff_ms(INIFile));
                     Buzzer.Start();
 
                     PromptUntilExit("q");
@@ -60,7 +68,7 @@ namespace SensorClient
             {
                 Console.WriteLine("Beginning in SendRandomData mode");
                 Scheduler = new RandomDataScheduler(CSVFile, INIFile);
-                Scheduler.SendData();
+                Scheduler.Start();
 
                 PromptUntilExit("q");
                 Console.WriteLine("Shutting random sensors down");

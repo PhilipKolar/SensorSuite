@@ -32,6 +32,16 @@ namespace WSNUtil
             }
         }
 
+        /// <summary>
+        /// Measured in milliseconds
+        /// </summary>
+        /// <param name="iniFile"></param>
+        /// <returns></returns>
+        public static float GetSensorClientTimeSchedulingTolerance_ms(string iniFile)
+        {
+            return ConfigFileParser.RetrieveInt("SENSOR_CLIENT_TIME_SCHEDULING_TOLERANCE", iniFile);
+        }
+
         public static string GetDisplayServerResultFolder(string iniFile)
         {
             return ConfigFileParser.RetrieveString("RESULT_OUTPUT_FOLDER", iniFile);
@@ -42,14 +52,14 @@ namespace WSNUtil
             return ConfigFileParser.RetrieveInt("SENSOR_CLIENT_BUZZER_PIN", iniFile);
         }
 
-        public static decimal GetSensorClientBuzzerTimeOn(string iniFile)
+        public static decimal GetSensorClientBuzzerTimeOn_ms(string iniFile)
         {
-            return (decimal)ConfigFileParser.RetrieveFloat("SENSOR_CLIENT_BUZZER_TIMEON_MS", iniFile);
+            return (decimal)ConfigFileParser.RetrieveFloat("SENSOR_CLIENT_BUZZER_TIMEON", iniFile);
         }
 
-        public static decimal GetSensorClientBuzzerTimeOff(string iniFile)
+        public static decimal GetSensorClientBuzzerTimeOff_ms(string iniFile)
         {
-            return (decimal)ConfigFileParser.RetrieveFloat("SENSOR_CLIENT_BUZZER_TIMEOFF_MS", iniFile);
+            return (decimal)ConfigFileParser.RetrieveFloat("SENSOR_CLIENT_BUZZER_TIMEOFF", iniFile);
         }
 
         public static string GetSensorServerMeasureStoreFilePath(string iniFile)
@@ -62,7 +72,7 @@ namespace WSNUtil
         /// </summary>
         /// <param name="iniFile"></param>
         /// <returns></returns>
-        public static float GetSensorClientTemperature(string iniFile)
+        public static float GetSensorClientTemperature_celcius(string iniFile)
         {
             return ConfigFileParser.RetrieveFloat("SENSOR_CLIENT_TEMPERATURE", iniFile);
         }
@@ -143,7 +153,7 @@ namespace WSNUtil
         /// </summary>
         /// <param name="configFile">File path of the INI-formatted confuration file containing a "POLLING_DELAY" property</param>
         /// <returns></returns>
-        public static int GetPollingDelay(string iniFile)
+        public static int GetPollingDelay_ms(string iniFile)
         {
             return ConfigFileParser.RetrieveInt("POLLING_DELAY", iniFile);
         }
@@ -158,7 +168,7 @@ namespace WSNUtil
             return ConfigFileParser.RetrieveInt("SENSOR_CLIENT_ECHO_PIN", iniFile);
         }
 
-        public static float GetSensorClientMaxDistance(string iniFile)
+        public static float GetSensorClientMaxDistance_cm(string iniFile)
         {
             return ConfigFileParser.RetrieveFloat("SENSOR_CLIENT_MAX_DISTANCE", iniFile);
         }

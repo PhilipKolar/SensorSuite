@@ -13,7 +13,7 @@ namespace SensorClient
         public ProcessorPin EchoPin { get; private set; }
         public IGpioConnectionDriver Driver { get; private set; }
         public float MaxDistance { get; private set; }
-        private static readonly float _TEMPERATURE = Variables.GetSensorClientTemperature(Variables.DefaultINILocation); //In Celcius. Needed for speed of sound calculation
+        private static readonly float _TEMPERATURE = Variables.GetSensorClientTemperature_celcius(Variables.DefaultINILocation); //In Celcius. Needed for speed of sound calculation
         public static readonly float SPEED_OF_SOUND = 331.3f + 0.606f * _TEMPERATURE; //Measured in meters per second
 
         public HCSR04Sensor(int echoPin, int triggerPin, float maxDistance)

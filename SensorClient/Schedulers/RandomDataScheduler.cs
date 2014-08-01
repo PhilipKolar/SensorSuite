@@ -27,7 +27,7 @@ namespace SensorClient.Schedulers
         /// <summary>
         /// Executes a number of threads proportionate to the number of sensors to emulate (i.e. same amount as in the CSVFile)
         /// </summary>
-        public void SendData()
+        public void Start()
         {
             List<Sensor> SensorList = Variables.GetSensorConfig(CSVFile);
             foreach (Sensor s in SensorList)
@@ -40,7 +40,7 @@ namespace SensorClient.Schedulers
         private void _SendRandomDataIndividual(object sensorId)
         {
             int SensorId = (int)sensorId;
-            int PollingDelay = Variables.GetPollingDelay(INIFile);
+            int PollingDelay = Variables.GetPollingDelay_ms(INIFile);
 
             do
             {

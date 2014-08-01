@@ -113,7 +113,7 @@ namespace DisplayServer
             lblMessageCount.Invoke((MethodInvoker)(() => lblMessageCount.Text = "0"));
             lblStatus.Invoke((MethodInvoker)(() => lblStatus.Text = "Connected"));
             lblStatus.Invoke((MethodInvoker)(() => lblStatus.ForeColor = Color.Green));
-            int PollingDelay = Variables.GetPollingDelay(INIFile);
+            int PollingDelay = Variables.GetPollingDelay_ms(INIFile);
             lblPollingFrequency.Invoke((MethodInvoker)(() => lblPollingFrequency.Text = string.Format("{0} Hz ({1} ms per measurement)", 1000 / PollingDelay, PollingDelay)));
             lblServerIP.Invoke((MethodInvoker)(() => lblServerIP.Text = string.Format("{0}:{1}", Receiver.ClientIP, Variables.GetDisplayPort(INIFile))));
         }

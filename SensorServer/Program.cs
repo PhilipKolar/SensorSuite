@@ -15,7 +15,7 @@ namespace SensorServer
         static string CSVFile = Variables.DefaultCSVLocation;
         static string INIFile = Variables.DefaultINILocation;
         static DateTime StartTime = DateTime.MinValue; //The tick count associated with time stage t = 0
-        static int PollingDelay = Variables.GetPollingDelay(INIFile);
+        static int PollingDelay = Variables.GetPollingDelay_ms(INIFile);
         static Dictionary<int, Sensor> SensorList = GetSensorDictionary(); //TODO: Convert to SortedDictionary for better performance
         static Mutex RawDataMutex = new Mutex(false);
         static MeasurementStore MeasureStore;

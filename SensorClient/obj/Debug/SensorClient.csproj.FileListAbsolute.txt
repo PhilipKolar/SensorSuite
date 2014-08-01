@@ -27,3 +27,14 @@ C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\BaselineSolution\Sens
 C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\BaselineSolution\SensorClient\obj\Debug\SensorClient.csprojResolveAssemblyReference.cache
 C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\BaselineSolution\SensorClient\obj\Debug\SensorClient.exe
 C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\BaselineSolution\SensorClient\obj\Debug\SensorClient.pdb
+C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\SensorClient\bin\Debug\SensorClient.exe
+C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\SensorClient\bin\Debug\SensorClient.pdb
+C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\SensorClient\bin\Debug\Raspberry.IO.GeneralPurpose.dll
+C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\SensorClient\bin\Debug\Raspberry.System.dll
+C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\SensorClient\bin\Debug\WSNUtil.dll
+C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\SensorClient\bin\Debug\WSNUtil.pdb
+C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\SensorClient\bin\Debug\Raspberry.IO.GeneralPurpose.xml
+C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\SensorClient\bin\Debug\Raspberry.System.xml
+C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\SensorClient\obj\Debug\SensorClient.csprojResolveAssemblyReference.cache
+C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\SensorClient\obj\Debug\SensorClient.exe
+C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\SensorClient\obj\Debug\SensorClient.pdb
