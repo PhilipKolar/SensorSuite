@@ -1,9 +1,6 @@
 Fix Max distance in both csv and ini
-Remove experiment folder from the solution directory tree
-Test Pi1 and Pi2
-Test laptop is working
-Fix timestage code
+Fix SensorServer-->DisplayServer timestage code not working (only with low latency?)
 Fix Client --> Server close connection message
 Add Sensor ID to INI file
 Refactor SensorServer-->Program.cs
-Make SensorServer more efficient when running for long times (remove elements from list(s))
+Make SensorServer more efficient when running for a long time (remove elements from list(s))
