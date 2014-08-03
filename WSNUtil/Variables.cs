@@ -39,7 +39,7 @@ namespace WSNUtil
         /// <returns></returns>
         public static float GetSensorClientTimeSchedulingTolerance_ms(string iniFile)
         {
-            return ConfigFileParser.RetrieveInt("SENSOR_CLIENT_TIME_SCHEDULING_TOLERANCE", iniFile);
+            return ConfigFileParser.RetrieveFloat("SENSOR_CLIENT_TIME_SCHEDULING_TOLERANCE", iniFile);
         }
 
         public static string GetDisplayServerResultFolder(string iniFile)
