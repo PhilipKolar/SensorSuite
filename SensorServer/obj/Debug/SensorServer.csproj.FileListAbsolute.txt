@@ -26,3 +26,10 @@ C:\Users\phili_000\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\Sensor
 C:\Users\phili_000\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\SensorServer\obj\Debug\SensorServer.csprojResolveAssemblyReference.cache
 C:\Users\phili_000\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\SensorServer\obj\Debug\SensorServer.exe
 C:\Users\phili_000\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\SensorServer\obj\Debug\SensorServer.pdb
+C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\SensorServer\bin\Debug\SensorServer.exe
+C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\SensorServer\bin\Debug\SensorServer.pdb
+C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\SensorServer\bin\Debug\WSNUtil.dll
+C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\SensorServer\bin\Debug\WSNUtil.pdb
+C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\SensorServer\obj\Debug\SensorServer.csprojResolveAssemblyReference.cache
+C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\SensorServer\obj\Debug\SensorServer.exe
+C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\SensorServer\obj\Debug\SensorServer.pdb

@@ -15,6 +15,7 @@ namespace SensorServer
         static string CSVFile = Variables.DefaultCSVLocation;
         static string INIFile = Variables.DefaultINILocation;
         static DateTime StartTime = DateTime.MinValue; //The tick count associated with time stage t = 0
+        static DateTime LocalStartTime = DateTime.MinValue; //Similar to above but represents the current machines time and not the recorded time
         static int PollingDelay = Variables.GetPollingDelay_ms(INIFile);
         static Dictionary<int, Sensor> SensorList = GetSensorDictionary(); //TODO: Convert to SortedDictionary for better performance
         static Mutex RawDataMutex = new Mutex(false);
@@ -35,7 +36,10 @@ namespace SensorServer
             List<Measurement> CurrentList;
             RawDataMutex.WaitOne();
             if (RawData.Count == 0)
+            {
                 StartTime = new DateTime(timeStamp.Ticks); //Initialise StartTimeTicks when the first message is received
+                LocalStartTime = DateTime.Now;
+            }
             if (RawData.TryGetValue(sensorID, out CurrentList) == false)
             { //If the dictionary has no entry for the currenty sensorID, make a list for it
                 CurrentList = new List<Measurement>();
@@ -196,7 +200,7 @@ namespace SensorServer
                 // Wait a delay equal to the PollingDelay to give sensors time to take and send their measurements
                 if (StartTime != DateTime.MinValue)
                 {
-                    DateTime ExpectedTime = StartTime.AddMilliseconds(PollingDelay * (CurrTimeStage + 1));
+                    DateTime ExpectedTime = LocalStartTime.AddMilliseconds(TOLERANCE_LAG + PollingDelay * (CurrTimeStage + 1));
                     int SleepTime = DateTime.Now > ExpectedTime ? 0 : PollingDelay;
                     Thread.Sleep(SleepTime); //Don't wait for the polling delay if we are behind schedule.
                     CurrTimeStage++;
