@@ -44,6 +44,9 @@
     <Compile Include="DisplaySender.cs" />
     <Compile Include="Estimators\ForwardEstimator.cs" />
     <Compile Include="Estimators\IEstimator.cs" />
+    <Compile Include="Estimators\InitialEstimator.cs" />
+    <Compile Include="Estimators\Tools\Trilaterator.cs" />
+    <Compile Include="Estimators\Tools\TrilateratorNoiseless0D.cs" />
     <Compile Include="MeasurementStore.cs" />
     <Compile Include="SensorReceiver.cs" />
     <Compile Include="Program.cs" />

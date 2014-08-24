@@ -4,3 +4,6 @@ Fix Client --> Server close connection message
 Add Sensor ID to INI file
 Refactor SensorServer-->Program.cs
 Make SensorServer more efficient when running for a long time (remove elements from list(s))
+Add Estimator functionality to INI file
+Fix SensorServer-->DisplayReceiver end sequence. currently disabled on DisplayReceiver as an empty list of ObjectEstimates triggers during normal usage (e.g. make it an array of all 1's)
+Draw a line from sensor to corresponding measurement (may be a lot of work)

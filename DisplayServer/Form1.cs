@@ -39,8 +39,10 @@ namespace DisplayServer
 
         public void MessageReceived(List<ObjectEstimate> rawData, List<ObjectEstimate> stateEstimate)
         {
-            if (rawData == null || stateEstimate == null)
-                return;
+            if (rawData == null)
+                rawData = new List<ObjectEstimate>();
+            if (stateEstimate == null)
+                stateEstimate = new List<ObjectEstimate>();
             DrawingMutex.WaitOne();
 
             if (Drawer == null)
@@ -67,9 +69,9 @@ namespace DisplayServer
             CSVMutex.WaitOne();
             StreamWriter Writer = new StreamWriter(string.Format("{0}/{1}", FolderPath, STATE_HISTORY_FILENAME), true);
             for (int i = 0; i < rawData.Count; i++)
-                Writer.WriteLine("r,{0},{1},{2},{3},{4}", CurrImageID, rawData[i].PositionX, rawData[i].PositionY, rawData[i].VelocityX, rawData[i].VelocityY);
+                Writer.WriteLine("r,{0},{1},{2},{3},{4}", CurrImageID, rawData[i].X, rawData[i].Y, rawData[i].VelocityX, rawData[i].VelocityY);
             for (int i = 0; i < stateEstimate.Count; i++)
-                Writer.WriteLine("s,{0},{1},{2},{3},{4}", CurrImageID, stateEstimate[i].PositionX, stateEstimate[i].PositionY, stateEstimate[i].VelocityX, stateEstimate[i].VelocityY);
+                Writer.WriteLine("s,{0},{1},{2},{3},{4}", CurrImageID, stateEstimate[i].X, stateEstimate[i].Y, stateEstimate[i].VelocityX, stateEstimate[i].VelocityY);
             Writer.Close();
             CSVMutex.ReleaseMutex();
         }

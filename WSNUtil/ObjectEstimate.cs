@@ -8,15 +8,15 @@ namespace WSNUtil
     [Serializable]
     public class ObjectEstimate
     {
-        public float PositionX { get; set; }
-        public float PositionY { get; set; }
+        public float X { get; set; }
+        public float Y { get; set; }
         public float VelocityX { get; set;  }
         public float VelocityY { get; set; }
 
         public ObjectEstimate(float positionX, float positionY, float velocityX, float velocityY)
         {
-            PositionX = positionX;
-            PositionY = positionY;
+            X = positionX;
+            Y = positionY;
             VelocityX = velocityX;
             VelocityY = velocityY;
         }
@@ -27,8 +27,8 @@ namespace WSNUtil
         /// <param name="toCopy">ObjectEstimate to copy into a new object</param>
         public ObjectEstimate(ObjectEstimate toCopy)
         {
-            PositionX = toCopy.PositionX;
-            PositionY = toCopy.PositionY;
+            X = toCopy.X;
+            Y = toCopy.Y;
             VelocityX = toCopy.VelocityX;
             VelocityY = toCopy.VelocityY;
         }

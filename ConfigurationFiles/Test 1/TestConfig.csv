@@ -3,9 +3,9 @@
 # The positive X axis points roughly east (towards the house), while the positive Y axis points roughly north.
 # Photo details: 
 
-30,90,141,-157,370 #FoV measured with string/protractor
-32,90,91,-157,370 #FoV measured with string/protractor
-38,90,41,-157,370 #FoV measured with string/protractor
-24,90,-9,-157,370 #FoV measured with string/protractor
-23.49,90,-59,-157,370 #FoV measured with coordinates
-40.69,90,-109,-157,370 #FoV measured with coordinates
+# 35,90,141,-157,370 #FoV measured with string/protractor
+35,90,78,-157,370 #FoV measured with string/protractor
+35,90,41,-157,370 #FoV measured with string/protractor
+35,90,-9,-157,370 #FoV measured with string/protractor
+35,90,-59,-157,370 #FoV measured with coordinates
+35,90,-109,-157,370 #FoV measured with coordinates

@@ -95,15 +95,15 @@ namespace DisplayServer //TODO: Change console.WriteLine()'s to something in the
                 //ListenerStream.Read(StateBuffer, 0, StateSize);
 
                 //Check for an end sequence
-                if (RawDataSize == 330 && StateSize == 330) //An empty list of ObjectEstimates will be 330 bytes
-                {
-                    _OutputTextbox.Invoke((MethodInvoker)(() => _OutputTextbox.Text += string.Format("Received end sequence from client {0}, no longer listening to this client\n", _GetIP(Client).ToString())));
-                    ListenerStream.Close();
-                    Client.Close();
-                    _ClientStreams.Remove(Client);
-                    _ConcurrentConnectionLimit.Release();
-                    return;
-                }
+                //if (RawDataSize == 330 && StateSize == 330) //An empty list of ObjectEstimates will be 330 bytes
+                //{
+                //    _OutputTextbox.Invoke((MethodInvoker)(() => _OutputTextbox.Text += string.Format("Received end sequence from client {0}, no longer listening to this client\n", _GetIP(Client).ToString())));
+                //    ListenerStream.Close();
+                //    Client.Close();
+                //    _ClientStreams.Remove(Client);
+                //    _ConcurrentConnectionLimit.Release();
+                //    return;
+                //}
 
                 BinaryFormatter Formatter = new BinaryFormatter();
 

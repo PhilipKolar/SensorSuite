@@ -120,7 +120,7 @@ namespace DisplayServer
 
         private void _DrawObject(Graphics gfx, ObjectEstimate toDraw, Brush brush, float circleRadius = 10f)
         {
-            _DrawCircle(gfx, toDraw.PositionX, toDraw.PositionY, circleRadius, circleRadius, brush);
+            _DrawCircle(gfx, toDraw.X, toDraw.Y, circleRadius, circleRadius, brush);
         }
 
         private void _DrawCircle(Graphics gfx, float x, float y, float circleWidth, float circleHeight, Brush brushCircle)
@@ -150,11 +150,11 @@ namespace DisplayServer
         private void _SetLowerXBound()
         {
             foreach (ObjectEstimate est in _RawData)
-                if (est.PositionX - BORDER < LowerXBound)
-                    LowerXBound = est.PositionX - BORDER;
+                if (est.X - BORDER < LowerXBound)
+                    LowerXBound = est.X - BORDER;
             foreach (ObjectEstimate est in _StateEstimate)
-                if (est.PositionX - BORDER < LowerXBound)
-                    LowerXBound = est.PositionX - BORDER;
+                if (est.X - BORDER < LowerXBound)
+                    LowerXBound = est.X - BORDER;
             foreach (Sensor Sen in _Sensors)
                 if (Sen.X - BORDER < LowerXBound)
                     LowerXBound = Sen.X - BORDER;
@@ -163,11 +163,11 @@ namespace DisplayServer
         private void _SetUpperXBound()
         {
             foreach (ObjectEstimate est in _RawData)
-                if (est.PositionX + BORDER > UpperXBound)
-                    UpperXBound = est.PositionX + BORDER;
+                if (est.X + BORDER > UpperXBound)
+                    UpperXBound = est.X + BORDER;
             foreach (ObjectEstimate est in _StateEstimate)
-                if (est.PositionX + BORDER > UpperXBound)
-                    UpperXBound = est.PositionX + BORDER;
+                if (est.X + BORDER > UpperXBound)
+                    UpperXBound = est.X + BORDER;
             foreach (Sensor Sen in _Sensors)
                 if (Sen.X + BORDER > UpperXBound)
                     UpperXBound = Sen.X + BORDER;
@@ -176,11 +176,11 @@ namespace DisplayServer
         private void _SetLowerYBound()
         {
             foreach (ObjectEstimate est in _RawData)
-                if (est.PositionY - BORDER < LowerYBound)
-                    LowerYBound = est.PositionY - BORDER;
+                if (est.Y - BORDER < LowerYBound)
+                    LowerYBound = est.Y - BORDER;
             foreach (ObjectEstimate est in _StateEstimate)
-                if (est.PositionY - BORDER < LowerYBound)
-                    LowerYBound = est.PositionY - BORDER;
+                if (est.Y - BORDER < LowerYBound)
+                    LowerYBound = est.Y - BORDER;
             foreach (Sensor Sen in _Sensors)
                 if (Sen.Y - BORDER < LowerYBound)
                     LowerYBound = Sen.Y - BORDER;
@@ -189,11 +189,11 @@ namespace DisplayServer
         private void _SetUpperYBound()
         {
             foreach (ObjectEstimate est in _RawData)
-                if (est.PositionY + BORDER > UpperYBound)
-                    UpperYBound = est.PositionY + BORDER;
+                if (est.Y + BORDER > UpperYBound)
+                    UpperYBound = est.Y + BORDER;
             foreach (ObjectEstimate est in _StateEstimate)
-                if (est.PositionY + BORDER > UpperYBound)
-                    UpperYBound = est.PositionY + BORDER;
+                if (est.Y + BORDER > UpperYBound)
+                    UpperYBound = est.Y + BORDER;
             foreach (Sensor Sen in _Sensors)
                 if (Sen.Y + BORDER > UpperYBound)
                     UpperYBound = Sen.Y + BORDER;
