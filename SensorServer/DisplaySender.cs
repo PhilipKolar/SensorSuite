@@ -49,7 +49,7 @@ namespace SensorServer
             ConnectionEstablished.Release();
         }
 
-        public void SendData(List<ObjectEstimate> rawDataToSend, List<ObjectEstimate> stateToSend)
+        public void SendData(List<ObjectEstimate> rawDataToSend, List<ObjectEstimate> stateToSend, List<ObjectEstimate> additionalInfoToSend)
         {
             if (!Connected)
                 throw new Exception("Could not send message to listener, not currently connected.");
@@ -57,16 +57,21 @@ namespace SensorServer
             BinaryFormatter Formatter = new BinaryFormatter();
             MemoryStream RawDataStream = new MemoryStream();
             MemoryStream StateStream = new MemoryStream();
+            MemoryStream AdditionalInfoStream = new MemoryStream();
             Formatter.Serialize(RawDataStream, rawDataToSend);
             Formatter.Serialize(StateStream, stateToSend);
-            byte[] DataToSend = new byte[4 + RawDataStream.Length + 4 + StateStream.Length]; //4 bytes for int (size of RawDataStream), 4 bytes for int (size of StateStream)
+            Formatter.Serialize(AdditionalInfoStream, additionalInfoToSend);
+            byte[] DataToSend = new byte[4 + RawDataStream.Length + 4 + StateStream.Length + 4 + AdditionalInfoStream.Length]; //Each 4 bytes is for an int representing size of stream (e.g. RawDataStream)
             RawDataStream.Position = 0;
             RawDataStream.Read(DataToSend, 4, (int)RawDataStream.Length);
             StateStream.Position = 0;
             StateStream.Read(DataToSend, 4 + (int)RawDataStream.Length + 4, (int)StateStream.Length);
+            AdditionalInfoStream.Position = 0;
+            AdditionalInfoStream.Read(DataToSend, 4 + (int)RawDataStream.Length + 4 + (int)StateStream.Length + 4, (int)AdditionalInfoStream.Length);
 
             Array.Copy(BitConverter.GetBytes((int)RawDataStream.Length), 0, DataToSend, 0, 4); //Copy in the length of rawDataToSend
             Array.Copy(BitConverter.GetBytes((int)StateStream.Length), 0, DataToSend, 4 + (int)RawDataStream.Length, 4); //Copy in the length of statetoSend
+            Array.Copy(BitConverter.GetBytes((int)AdditionalInfoStream.Length), 0, DataToSend, 4 + (int)RawDataStream.Length + 4 + (int)StateStream.Length, 4); //Copy in the length of additionalInfoToSend
 
             if (_ListenerStream == null) //Runs the first time only
                 _ListenerStream = _ClientConnection.GetStream();
@@ -78,7 +83,7 @@ namespace SensorServer
         {
             try
             {
-                SendData(new List<ObjectEstimate>(), new List<ObjectEstimate>()); //Send an end sequence to the server before finishing
+                SendData(new List<ObjectEstimate>(), new List<ObjectEstimate>(), new List<ObjectEstimate>()); //Send an end sequence to the server before finishing
             }
             catch (Exception ex)
             {

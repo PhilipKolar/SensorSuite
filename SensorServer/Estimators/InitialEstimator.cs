@@ -12,13 +12,18 @@ namespace SensorServer.Estimators
     /// </summary>
     class InitialEstimator : IEstimator
     {
+        public List<ObjectEstimate> CurrEsimate { get; private set; }
+        public List<ObjectEstimate> CurrAdditionalInfo { get; private set; }
+        private string _INIFile;
+
         private List<Tuple<Sensor, Measurement>> CurrentStageMeasurements;
         private List<List<Tuple<Sensor, Measurement>>> PreviousStagesMeasurements;
 
-        public InitialEstimator()
+        public InitialEstimator(string iniFile)
         {
             CurrentStageMeasurements = new List<Tuple<Sensor, Measurement>>();
             PreviousStagesMeasurements = new List<List<Tuple<Sensor, Measurement>>>();
+            _INIFile = iniFile;
         }
 
         public void AddMeasurement(Sensor source, Measurement measurement)
@@ -28,14 +33,15 @@ namespace SensorServer.Estimators
 
         public List<ObjectEstimate> ComputeEstimate()
         {
-            TrilateratorNoiseless0D Trileration = new TrilateratorNoiseless0D();
+            TrilateratorNoiseless0D Trileration = new TrilateratorNoiseless0D(Variables.GetSensorServerTrilateratorNoiseless0DDistanceTolerance(_INIFile));
             List<ObjectEstimate> TrilateratedData = Trileration.CalculateEstimates(CurrentStageMeasurements);
 
             PreviousStagesMeasurements.Add(CurrentStageMeasurements);
-            CurrentStageMeasurements= new List<Tuple<Sensor, Measurement>>();
-
+            CurrentStageMeasurements = new List<Tuple<Sensor, Measurement>>();
             //TODO: Track/filter/etc
 
+            CurrEsimate = TrilateratedData;
+            CurrAdditionalInfo = Trileration.CurrAdditionalInfo;
             return TrilateratedData;
         }
     }

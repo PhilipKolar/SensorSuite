@@ -12,7 +12,7 @@ using System.Windows.Forms;
 
 namespace DisplayServer //TODO: Change console.WriteLine()'s to something in the form
 {
-    public delegate void MessageReceievedDelegate(List<ObjectEstimate> RawData, List<ObjectEstimate> StateEstimate);
+    public delegate void MessageReceievedDelegate(List<ObjectEstimate> RawData, List<ObjectEstimate> StateEstimate, List<ObjectEstimate> AdditionalStateInfo );
     class DisplayReceiver
     {
         private IPAddress _ServerIP;
@@ -88,13 +88,18 @@ namespace DisplayServer //TODO: Change console.WriteLine()'s to something in the
                 //Retrieve the state estiamtion data from the network stream
                 byte[] StateSizeBuffer = new byte[4];
                 _WaitAndRead(ListenerStream, StateSizeBuffer, StateSizeBuffer.Length);
-                //ListenerStream.Read(StateSizeBuffer, 0, StateSizeBuffer.Length);
                 int StateSize = BitConverter.ToInt32(StateSizeBuffer, 0);
                 byte[] StateBuffer = new byte[StateSize];
                 _WaitAndRead(ListenerStream, StateBuffer, StateSize);
-                //ListenerStream.Read(StateBuffer, 0, StateSize);
 
-                //Check for an end sequence
+                //Retrieve the additional state estiamtion data from the network stream
+                byte[] AdditionalStateSizeBuffer = new byte[4];
+                _WaitAndRead(ListenerStream, AdditionalStateSizeBuffer, AdditionalStateSizeBuffer.Length);
+                int AdditionalStateSize = BitConverter.ToInt32(AdditionalStateSizeBuffer, 0);
+                byte[] AdditionalStateBuffer = new byte[AdditionalStateSize];
+                _WaitAndRead(ListenerStream, AdditionalStateBuffer, AdditionalStateSize);
+
+                //Check for an end sequence //TODO: FIX!
                 //if (RawDataSize == 330 && StateSize == 330) //An empty list of ObjectEstimates will be 330 bytes
                 //{
                 //    _OutputTextbox.Invoke((MethodInvoker)(() => _OutputTextbox.Text += string.Format("Received end sequence from client {0}, no longer listening to this client\n", _GetIP(Client).ToString())));
@@ -118,8 +123,13 @@ namespace DisplayServer //TODO: Change console.WriteLine()'s to something in the
                 StateStream.Write(StateBuffer, 0, StateBuffer.Length);
                 StateStream.Position = 0;
                 List<ObjectEstimate> StateList = (List<ObjectEstimate>)Formatter.Deserialize(StateStream);
-                
-                OnMessageReceived(RawDataList, StateList);
+
+                MemoryStream AdditionalStateStream = new MemoryStream();
+                AdditionalStateStream.Write(AdditionalStateBuffer, 0, AdditionalStateBuffer.Length);
+                AdditionalStateStream.Position = 0;
+                List<ObjectEstimate> AdditionalStateList = (List<ObjectEstimate>)Formatter.Deserialize(AdditionalStateStream);
+
+                OnMessageReceived(RawDataList, StateList, AdditionalStateList);
             }
         }
 

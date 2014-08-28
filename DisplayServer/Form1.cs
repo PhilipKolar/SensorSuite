@@ -22,6 +22,7 @@ namespace DisplayServer
         private StateDrawer Drawer;
         private string FolderPath; // For image and CSV result output
         const string STATE_HISTORY_FILENAME = "StateHistory.csv";
+        private bool DrawAdditionalInfo;
 
         public frmDisplayServer()
         {
@@ -29,6 +30,7 @@ namespace DisplayServer
             try
             {
                 FolderPath = Variables.GetDisplayServerResultFolder(INIFile);
+                DrawAdditionalInfo = Variables.GetDisplayServerDrawAdditional(INIFile);
             }
             catch (Exception ex)
             {
@@ -37,18 +39,20 @@ namespace DisplayServer
             }
         }
 
-        public void MessageReceived(List<ObjectEstimate> rawData, List<ObjectEstimate> stateEstimate)
+        public void MessageReceived(List<ObjectEstimate> rawData, List<ObjectEstimate> stateEstimate, List<ObjectEstimate> additionalStateInfo)
         {
             if (rawData == null)
                 rawData = new List<ObjectEstimate>();
             if (stateEstimate == null)
                 stateEstimate = new List<ObjectEstimate>();
+            if (additionalStateInfo == null)
+                additionalStateInfo = new List<ObjectEstimate>();
             DrawingMutex.WaitOne();
 
             if (Drawer == null)
-                Drawer = new StateDrawer(rawData, stateEstimate, picCurrState.Width, picCurrState.Height, CSVFile);
+                Drawer = new StateDrawer(rawData, stateEstimate, additionalStateInfo, picCurrState.Width, picCurrState.Height, CSVFile, Variables.GetDrawDisplayServerDrawXY1To1(INIFile));
             else
-                Drawer.SetStates(rawData, stateEstimate);
+                Drawer.SetStates(rawData, stateEstimate, additionalStateInfo);
             Bitmap Bmp = Drawer.DrawState();
 
             Bitmap BmpCopy = (Bitmap)Bmp.Clone(); // Need a copy in order to Save() and display it at the same time, since Bitmap is not a thread safe class

@@ -8,11 +8,17 @@ namespace SensorServer.Estimators.Tools
 {
     class TrilateratorNoiseless0D : Trilaterator
     {
-        public TrilateratorNoiseless0D()
-        { }
+        public double DistanceTolerance { get; private set; }
+        public List<ObjectEstimate> CurrAdditionalInfo { get; private set; }
+        public TrilateratorNoiseless0D(double distanceTolerance)
+        {
+            DistanceTolerance = distanceTolerance;
+        }
 
         public override List<ObjectEstimate> CalculateEstimates(List<Tuple<Sensor, Measurement>> Measurements)
         {
+            CurrAdditionalInfo = new List<ObjectEstimate>();
+
             List<ObjectEstimate> MasterList = new List<ObjectEstimate>();
             for (int Sensor1Index = 0; Sensor1Index < Measurements.Count; Sensor1Index++)
             {
@@ -23,39 +29,68 @@ namespace SensorServer.Estimators.Tools
                     {
                         if (_IsWithinVision(oe, new Sensor[] { Measurements[Sensor1Index].Item1, Measurements[Sensor2Index].Item1 }))
                             MasterList.Add(oe);
+                        else
+                            CurrAdditionalInfo.Add(oe);
                     }
                 }
             }
 
-            List<ObjectEstimate> ProximityFilteredEstimates = _RunProximityFilter(MasterList, 10); //TODO: Add threshold to INI file
+            List<ObjectEstimate> ProximityFilteredEstimates = _RunProximityFilter(MasterList);
             return ProximityFilteredEstimates;
         }
 
 
-        private List<ObjectEstimate> _RunProximityFilter(List<ObjectEstimate> dataToFilter, double distanceThreshold)
+        private List<ObjectEstimate> _RunProximityFilter(List<ObjectEstimate> dataToFilter)
         {
-            List<ObjectEstimate> Anchors = new List<ObjectEstimate>(); //Thresholds are measured with respect to these anchors, which are assigned when a new measurement is found that doesn't belong to another anchor
+            //TODO: Add a limit to how much each anchor can drift. Probably change Tuple to a container sub-class
+            List<Tuple<ObjectEstimate, int>> Anchors = new List<Tuple<ObjectEstimate, int>>(); //Thresholds are measured with respect to these anchors, which are assigned when a new measurement is found that doesn't belong to another anchor
+                                                                                               //int represents the amount of measurements an anchor represents (used for mean calculation).
             foreach (ObjectEstimate oe in dataToFilter)
             {
-                if (_IsNewAnchor(oe, Anchors, distanceThreshold))
+                Tuple<ObjectEstimate, int> CurrAnchor = _GetAnchor(oe, Anchors, DistanceTolerance);
+                Tuple<ObjectEstimate, int> CurrAnchor2 = _GetAnchor(oe, Anchors, DistanceTolerance);
+                if (CurrAnchor == null) //No anchors in range, assignment current candidate as a new anchor
                 {
-                    Anchors.Add(oe);
+                    Anchors.Add(new Tuple<ObjectEstimate, int>(oe, 1));
+                }
+                else
+                { //Average current position of anchor with new candidate
+                    CurrAnchor.Item1.X = (float)UpdateAverage(CurrAnchor.Item1.X, CurrAnchor.Item2, oe.X);
+                    CurrAnchor.Item1.Y = (float)UpdateAverage(CurrAnchor.Item1.Y, CurrAnchor.Item2, oe.Y);
                 }
             }
 
-            return Anchors;
+            List<ObjectEstimate> AnchorsToReturn = new List<ObjectEstimate>();
+            foreach (Tuple<ObjectEstimate, int> anchor in Anchors) //Convert Anchors to a list suitable for returning
+            {
+                AnchorsToReturn.Add(anchor.Item1);
+            }
+            return AnchorsToReturn;
         }
 
-        private bool _IsNewAnchor(ObjectEstimate currCandidate, List<ObjectEstimate> Anchors, double distanceThreshold)
+        private double UpdateAverage(double currentAverage, int previousCount, double newNumber)
         {
-            foreach (ObjectEstimate anchor in Anchors)
+            if (previousCount == 0)
+                return newNumber;
+            else if (previousCount < 0)
+                throw new ArgumentOutOfRangeException("Average count cannot be negative");
+
+            double DivisionRemoved = currentAverage * previousCount;
+            double NewNumberInserted = DivisionRemoved + newNumber;
+            double DivisionReapplied = NewNumberInserted / (previousCount + 1);
+            return DivisionReapplied;
+        }
+
+        private Tuple<ObjectEstimate, int> _GetAnchor(ObjectEstimate currCandidate, List<Tuple<ObjectEstimate, int>> Anchors, double distanceThreshold)
+        {
+            foreach (Tuple<ObjectEstimate, int> anchorTuple in Anchors)
             {
-                if (_DistanceBetween(currCandidate, anchor) <= distanceThreshold)
+                if (_DistanceBetween(currCandidate, anchorTuple.Item1) <= distanceThreshold)
                 {
-                    return false;
+                    return anchorTuple;
                 }
             }
-            return true;
+            return null;
         }
 
 

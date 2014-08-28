@@ -187,7 +187,7 @@ namespace SensorServer
             while (true)
             {
                 IEstimator RawMeasurementEstimator = new ForwardEstimator();
-                IEstimator ObjectCandidateEstimator = new InitialEstimator();
+                IEstimator ObjectCandidateEstimator = new InitialEstimator(INIFile);
                 List<Measurement> CurrStageMeasurements = GetTimeStageMeasurements(CurrTimeStage);
                 if (CurrStageMeasurements.Count != 0)
                 {
@@ -198,7 +198,7 @@ namespace SensorServer
                     }
                     List<ObjectEstimate> RawMeasurementEstimate = RawMeasurementEstimator.ComputeEstimate();
                     List<ObjectEstimate> ObjectCandidateEstimate = ObjectCandidateEstimator.ComputeEstimate();
-                    Sender.SendData(RawMeasurementEstimate, ObjectCandidateEstimate);
+                    Sender.SendData(RawMeasurementEstimate, ObjectCandidateEstimate, ObjectCandidateEstimator.CurrAdditionalInfo);
                     Console.WriteLine("Data for time stage {0} sent to display server", CurrTimeStage);
                 }
 

@@ -32,6 +32,21 @@ namespace WSNUtil
             }
         }
 
+        public static double GetSensorServerTrilateratorNoiseless0DDistanceTolerance(string iniFile)
+        {
+            return ConfigFileParser.RetrieveDouble("TRILATERATOR_NOISELESS_0D_DISTANCE_TOLERANCE", iniFile);
+        }
+
+        public static bool GetDrawDisplayServerDrawXY1To1(string iniFile)
+        {
+            return ConfigFileParser.RetriveBool("DRAW_XY_AXIS_1_TO_1", iniFile);
+        }
+
+        public static bool GetDisplayServerDrawAdditional(string iniFile)
+        {
+            return ConfigFileParser.RetriveBool("DRAW_ADDITIONAL", iniFile);
+        }
+
         /// <summary>
         /// Measured in milliseconds
         /// </summary>
@@ -79,16 +94,7 @@ namespace WSNUtil
 
         public static bool GetSensorClientTimeDivison(string iniFile)
         {
-            string Result = ConfigFileParser.RetrieveString("SENSOR_CLIENT_TIME_DIVISON", iniFile);
-            try
-            {
-                return bool.Parse(Result);
-            }
-            catch (Exception e)
-            {
-                throw new ArgumentException(string.Format("Error retrieving SENSOR_CLIENT_TIME_DIVISON, value could not be parsed to a boolean. " +
-                    "Value found: '{0}', expected either 'true' or 'false'. Original exception message: '{1}'", Result, e.Message));
-            }
+            return ConfigFileParser.RetriveBool("SENSOR_CLIENT_TIME_DIVISON", iniFile);
         }
 
         public static string GetSensorClientMeasureExecutable(string iniFile)

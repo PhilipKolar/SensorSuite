@@ -17,7 +17,7 @@ namespace SensorServer.Estimators.Tools
                 if (candidate.X == s.X && candidate.Y == s.Y)
                     continue;
 
-                double candidatePhi = _ToDeg(Math.Atan((s.Y - candidate.Y) / (s.X - candidate.X)));
+                double candidatePhi = Math.Abs(_ToDeg(Math.Atan((s.Y - candidate.Y) / (s.X - candidate.X))));
                 if (candidate.X <= s.X && candidate.Y >= s.Y)
                 {
                     candidatePhi = 180 - candidatePhi;

@@ -12,6 +12,9 @@ namespace SensorServer.Estimators
     /// </summary>
     public class ForwardEstimator : IEstimator
     {
+        public List<ObjectEstimate> CurrEsimate { get; private set; }
+        public List<ObjectEstimate> CurrAdditionalInfo { get { throw new NotImplementedException("ForwardEstimator does not provide additional information"); } }
+
         private List<Tuple<Sensor, Measurement>> CurrentStageMeasurements;
 
         public ForwardEstimator()
@@ -26,17 +29,18 @@ namespace SensorServer.Estimators
 
         public List<ObjectEstimate> ComputeEstimate()
         {
-            List<ObjectEstimate> CurrentEstimate = new List<ObjectEstimate>();
+            List<ObjectEstimate> NextEstimate = new List<ObjectEstimate>();
             foreach (Tuple<Sensor, Measurement> measurementPair in CurrentStageMeasurements)
             {
                 float EstimatedXPosition = measurementPair.Item1.X + (float)Math.Cos(measurementPair.Item1.Phi * Math.PI / 180) * measurementPair.Item2.Distance;
                 float EstimatedYPosition = measurementPair.Item1.Y + (float)Math.Sin(measurementPair.Item1.Phi * Math.PI / 180) * measurementPair.Item2.Distance;
 
                 ObjectEstimate CurrEstimate = new ObjectEstimate(EstimatedXPosition, EstimatedYPosition, 0f, 0f);
-                CurrentEstimate.Add(CurrEstimate);
+                NextEstimate.Add(CurrEstimate);
             }
 
-            return CurrentEstimate;
+            CurrEsimate = NextEstimate;
+            return NextEstimate;
         }
     }
 }

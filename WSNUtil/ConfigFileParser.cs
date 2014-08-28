@@ -11,6 +11,29 @@ namespace WSNUtil
     {
         private static class ConfigFileParser
         {
+            public static bool RetriveBool(string fieldName, string iniFile)
+            {
+                StreamReader Reader = new StreamReader(iniFile);
+                bool ToReturn = false; //Initialise to any value or compiler won't let us return, this value won't be used.
+                bool Found = false;
+                while (!Reader.EndOfStream)
+                {
+                    string CurrLine = Reader.ReadLine();
+                    string[] EqualsSplit = CurrLine.Split(new char[] { '#', ';' })[0].Split('=');
+                    if (EqualsSplit.Length != 2) // No equals sign or too many equals signs
+                        continue;
+                    if (EqualsSplit[0].Trim().ToUpper() == fieldName.ToUpper() && bool.TryParse(EqualsSplit[1].Trim(), out ToReturn))
+                    {
+                        Found = true;
+                        break;
+                    }
+                }
+                Reader.Close();
+                if (!Found)
+                    throw new Exception(string.Format("Error reading config file, could not find a valid value for {0}", fieldName));
+                return ToReturn;
+            }
+
             public static int RetrieveInt(string fieldName, string iniFile)
             {
                 StreamReader Reader = new StreamReader(iniFile);
@@ -46,6 +69,29 @@ namespace WSNUtil
                     if (EqualsSplit.Length != 2) // No equals sign or too many equals signs
                         continue;
                     if (EqualsSplit[0].Trim().ToUpper() == fieldName.ToUpper() && float.TryParse(EqualsSplit[1].Trim(), out ToReturn))
+                    {
+                        Found = true;
+                        break;
+                    }
+                }
+                Reader.Close();
+                if (!Found)
+                    throw new Exception(string.Format("Error reading config file, could not find a valid value for {0}", fieldName));
+                return ToReturn;
+            }
+
+            public static double RetrieveDouble(string fieldName, string iniFile)
+            {
+                StreamReader Reader = new StreamReader(iniFile);
+                double ToReturn = -1;
+                bool Found = false;
+                while (!Reader.EndOfStream)
+                {
+                    string CurrLine = Reader.ReadLine();
+                    string[] EqualsSplit = CurrLine.Split(new char[] { '#', ';' })[0].Split('=');
+                    if (EqualsSplit.Length != 2) // No equals sign or too many equals signs
+                        continue;
+                    if (EqualsSplit[0].Trim().ToUpper() == fieldName.ToUpper() && double.TryParse(EqualsSplit[1].Trim(), out ToReturn))
                     {
                         Found = true;
                         break;
