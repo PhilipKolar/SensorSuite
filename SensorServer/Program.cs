@@ -88,6 +88,25 @@ namespace SensorServer
             return ToReturn;
         }
 
+        /// <summary>
+        /// Removes all measurements from stated time stage and below. NOT guaranteed to catch all, breaks once a higer time stage is found, for performance (removing absolutely every measurement right away is not essential)
+        /// </summary>
+        /// <param name="timestage"></param>
+        static void RemoveTimeStageMeasurements(int timestage)
+        {
+            RawDataMutex.WaitOne();
+            foreach (KeyValuePair<int, List<Measurement>> sensorMeasurements in RawData)
+            {
+                while (sensorMeasurements.Value.Count != 0)
+                {
+                    if (sensorMeasurements.Value[0].TimeStage > timestage)
+                        break;
+                    sensorMeasurements.Value.RemoveAt(0); //TODO: Change this operation, RemoveAt(0) is O(n) complexity as it shifts data elements down the array
+                }
+            }
+            RawDataMutex.ReleaseMutex();
+        }
+
         static void Main()
         {
             SensorServerMode Mode;
@@ -183,12 +202,13 @@ namespace SensorServer
             Sender.ConnectionEstablished.WaitOne();
             Sender.ConnectionEstablished.Release();
             int CurrTimeStage = 0;
-            
+
+            IEstimator RawMeasurementEstimator = new ForwardEstimator();
+            IEstimator ObjectCandidateEstimator = new InitialEstimator(INIFile);
             while (true)
             {
-                IEstimator RawMeasurementEstimator = new ForwardEstimator();
-                IEstimator ObjectCandidateEstimator = new InitialEstimator(INIFile);
                 List<Measurement> CurrStageMeasurements = GetTimeStageMeasurements(CurrTimeStage);
+
                 if (CurrStageMeasurements.Count != 0)
                 {
                     foreach (Measurement CurrMeasurement in CurrStageMeasurements)
@@ -202,6 +222,7 @@ namespace SensorServer
                     Console.WriteLine("Data for time stage {0} sent to display server", CurrTimeStage);
                 }
 
+                RemoveTimeStageMeasurements(CurrTimeStage);
                 // Wait a delay equal to the PollingDelay to give sensors time to take and send their measurements
                 if (StartTime != DateTime.MinValue)
                 {

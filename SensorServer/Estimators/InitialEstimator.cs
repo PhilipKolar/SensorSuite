@@ -33,7 +33,8 @@ namespace SensorServer.Estimators
 
         public List<ObjectEstimate> ComputeEstimate()
         {
-            TrilateratorNoiseless0D Trileration = new TrilateratorNoiseless0D(Variables.GetSensorServerTrilateratorNoiseless0DDistanceTolerance(_INIFile));
+            TrilateratorNoiseless0D Trileration = new TrilateratorNoiseless0D(Variables.GetSensorServerTrilateratorNoiseless0DDistanceTolerance(_INIFile),
+                                                                              Variables.GetSensorServerTrilateratorNoiseless0DAveragingAnchor(_INIFile) );
             List<ObjectEstimate> TrilateratedData = Trileration.CalculateEstimates(CurrentStageMeasurements);
 
             PreviousStagesMeasurements.Add(CurrentStageMeasurements);

@@ -10,9 +10,11 @@ namespace SensorServer.Estimators.Tools
     {
         public double DistanceTolerance { get; private set; }
         public List<ObjectEstimate> CurrAdditionalInfo { get; private set; }
-        public TrilateratorNoiseless0D(double distanceTolerance)
+        public bool AveragingAnchor { get; private set; }
+        public TrilateratorNoiseless0D(double distanceTolerance, bool averagingAnchor)
         {
             DistanceTolerance = distanceTolerance;
+            AveragingAnchor = averagingAnchor;
         }
 
         public override List<ObjectEstimate> CalculateEstimates(List<Tuple<Sensor, Measurement>> Measurements)
@@ -54,9 +56,12 @@ namespace SensorServer.Estimators.Tools
                     Anchors.Add(new Tuple<ObjectEstimate, int>(oe, 1));
                 }
                 else
-                { //Average current position of anchor with new candidate
-                    CurrAnchor.Item1.X = (float)UpdateAverage(CurrAnchor.Item1.X, CurrAnchor.Item2, oe.X);
-                    CurrAnchor.Item1.Y = (float)UpdateAverage(CurrAnchor.Item1.Y, CurrAnchor.Item2, oe.Y);
+                {
+                    if (AveragingAnchor) //Average current position of anchor with new candidate
+                    {
+                        CurrAnchor.Item1.X = (float)UpdateAverage(CurrAnchor.Item1.X, CurrAnchor.Item2, oe.X);
+                        CurrAnchor.Item1.Y = (float)UpdateAverage(CurrAnchor.Item1.Y, CurrAnchor.Item2, oe.Y);
+                    }
                 }
             }
 

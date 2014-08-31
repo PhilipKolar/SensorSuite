@@ -45,6 +45,7 @@
     <Compile Include="Estimators\ForwardEstimator.cs" />
     <Compile Include="Estimators\IEstimator.cs" />
     <Compile Include="Estimators\InitialEstimator.cs" />
+    <Compile Include="Estimators\Tools\KalmanFilter2D.cs" />
     <Compile Include="Estimators\Tools\Trilaterator.cs" />
     <Compile Include="Estimators\Tools\TrilateratorNoiseless0D.cs" />
     <Compile Include="MeasurementStore.cs" />
@@ -57,6 +58,17 @@
       <Project>{537c5ac6-4776-4190-baf7-cd89889ceed7}</Project>
       <Name>WSNUtil</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="MLApp">
+      <Guid>{C36E46AB-6A81-457B-9F91-A7719A06287F}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

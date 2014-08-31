@@ -32,6 +32,11 @@ namespace WSNUtil
             }
         }
 
+        public static bool GetSensorServerTrilateratorNoiseless0DAveragingAnchor(string iniFile)
+        {
+            return ConfigFileParser.RetrieveBool("TRILATERATOR_NOISELESS_0D_AVERAGING_ANCHOR", iniFile);
+        }
+
         public static double GetSensorServerTrilateratorNoiseless0DDistanceTolerance(string iniFile)
         {
             return ConfigFileParser.RetrieveDouble("TRILATERATOR_NOISELESS_0D_DISTANCE_TOLERANCE", iniFile);
@@ -39,12 +44,12 @@ namespace WSNUtil
 
         public static bool GetDrawDisplayServerDrawXY1To1(string iniFile)
         {
-            return ConfigFileParser.RetriveBool("DRAW_XY_AXIS_1_TO_1", iniFile);
+            return ConfigFileParser.RetrieveBool("DRAW_XY_AXIS_1_TO_1", iniFile);
         }
 
         public static bool GetDisplayServerDrawAdditional(string iniFile)
         {
-            return ConfigFileParser.RetriveBool("DRAW_ADDITIONAL", iniFile);
+            return ConfigFileParser.RetrieveBool("DRAW_ADDITIONAL", iniFile);
         }
 
         /// <summary>
@@ -94,7 +99,7 @@ namespace WSNUtil
 
         public static bool GetSensorClientTimeDivison(string iniFile)
         {
-            return ConfigFileParser.RetriveBool("SENSOR_CLIENT_TIME_DIVISON", iniFile);
+            return ConfigFileParser.RetrieveBool("SENSOR_CLIENT_TIME_DIVISON", iniFile);
         }
 
         public static string GetSensorClientMeasureExecutable(string iniFile)

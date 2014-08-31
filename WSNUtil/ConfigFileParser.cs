@@ -11,7 +11,7 @@ namespace WSNUtil
     {
         private static class ConfigFileParser
         {
-            public static bool RetriveBool(string fieldName, string iniFile)
+            public static bool RetrieveBool(string fieldName, string iniFile)
             {
                 StreamReader Reader = new StreamReader(iniFile);
                 bool ToReturn = false; //Initialise to any value or compiler won't let us return, this value won't be used.
