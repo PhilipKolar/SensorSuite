@@ -40,6 +40,7 @@ namespace SensorServer.Estimators
             }
 
             CurrEsimate = NextEstimate;
+            CurrentStageMeasurements = new List<Tuple<Sensor, Measurement>>();
             return NextEstimate;
         }
     }
