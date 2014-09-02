@@ -12,6 +12,7 @@ namespace DisplayServer
         private List<ObjectEstimate> _RawData; //List of raw data positions to draw
         private List<ObjectEstimate> _StateEstimate; //List of estimated object positions to draw
         private List<ObjectEstimate> _AdditionalStateInfo; //List of addition object positions to draw
+        private List<ObjectEstimate> _RealState; //List of real object positions to draw
         private List<Sensor> _Sensors; //List of sensors to draw (both their locations and FoVs)
         public float LowerXBound { get; private set; } //The minimum value in the X axis for the real world measurements
         public float UpperXBound { get; private set; } //The maximum value in the X axis for the real world measurements
@@ -25,7 +26,7 @@ namespace DisplayServer
         public int Height { get; private set; } //Height of the bitmap
         private bool _Draw1To1;
 
-        public StateDrawer(List<ObjectEstimate> rawData, List<ObjectEstimate> stateEstimate, List<ObjectEstimate> additionalStateInfo, int width, int height, string csvFile, bool draw1To1)
+        public StateDrawer(List<ObjectEstimate> rawData, List<ObjectEstimate> stateEstimate, List<ObjectEstimate> additionalStateInfo, List<ObjectEstimate> realState, int width, int height, string csvFile, bool draw1To1)
         {
             _Draw1To1 = draw1To1;
 
@@ -35,6 +36,7 @@ namespace DisplayServer
             _RawData = rawData;
             _StateEstimate = stateEstimate;
             _AdditionalStateInfo = additionalStateInfo;
+            _RealState = realState;
             _Sensors = Variables.GetSensorConfig(csvFile);
 
             LowerXBound = -30;
@@ -44,11 +46,12 @@ namespace DisplayServer
             _SetAllBounds();
         }
 
-        public void SetStates(List<ObjectEstimate> rawData, List<ObjectEstimate> stateEstimate, List<ObjectEstimate> additionalStateInfo)
+        public void SetStates(List<ObjectEstimate> rawData, List<ObjectEstimate> stateEstimate, List<ObjectEstimate> additionalStateInfo, List<ObjectEstimate> realState)
         {
             _RawData = rawData;
             _StateEstimate = stateEstimate;
             _AdditionalStateInfo = additionalStateInfo;
+            _RealState = realState;
 
             _SetAllBounds();
         }
@@ -62,12 +65,14 @@ namespace DisplayServer
             _DrawAxes(Gfx);
             foreach (Sensor Sen in _Sensors)
                 _DrawSensor(Gfx, Sen);
-            foreach (ObjectEstimate Obj in _StateEstimate)
-                _DrawObject(Gfx, Obj, Brushes.Blue, 15f);
             foreach (ObjectEstimate Obj in _AdditionalStateInfo)
                 _DrawObject(Gfx, Obj, Brushes.Yellow, 15f);
+            foreach (ObjectEstimate Obj in _StateEstimate)
+                _DrawObject(Gfx, Obj, Brushes.Blue, 15f);
+            foreach (ObjectEstimate Obj in _RealState)
+                _DrawObject(Gfx, Obj, Brushes.Green, 15f);
             foreach (ObjectEstimate Obj in _RawData)
-                _DrawObject(Gfx, Obj, Brushes.Gray);
+                _DrawObject(Gfx, Obj, Brushes.Gray, 8f);
 
             return Bmp;
         }
@@ -126,7 +131,7 @@ namespace DisplayServer
             gfx.DrawLine(PenSensor, StartPoint, EndPoint2);
         }
 
-        private void _DrawObject(Graphics gfx, ObjectEstimate toDraw, Brush brush, float circleRadius = 10f)
+        private void _DrawObject(Graphics gfx, ObjectEstimate toDraw, Brush brush, float circleRadius)
         {
             _DrawCircle(gfx, toDraw.X, toDraw.Y, circleRadius, circleRadius, brush);
         }
@@ -173,6 +178,9 @@ namespace DisplayServer
             foreach (ObjectEstimate est in _AdditionalStateInfo)
                 if (est.X - BORDER < LowerXBound)
                     LowerXBound = est.X - BORDER;
+            foreach (ObjectEstimate est in _RealState)
+                if (est.X - BORDER < LowerXBound)
+                    LowerXBound = est.X - BORDER;
             foreach (Sensor Sen in _Sensors)
                 if (Sen.X - BORDER < LowerXBound)
                     LowerXBound = Sen.X - BORDER;
@@ -187,6 +195,9 @@ namespace DisplayServer
                 if (est.X + BORDER > UpperXBound)
                     UpperXBound = est.X + BORDER;
             foreach (ObjectEstimate est in _AdditionalStateInfo)
+                if (est.X + BORDER > UpperXBound)
+                    UpperXBound = est.X + BORDER;
+            foreach (ObjectEstimate est in _RealState)
                 if (est.X + BORDER > UpperXBound)
                     UpperXBound = est.X + BORDER;
             foreach (Sensor Sen in _Sensors)
@@ -205,6 +216,9 @@ namespace DisplayServer
             foreach (ObjectEstimate est in _AdditionalStateInfo)
                 if (est.Y - BORDER < LowerYBound)
                     LowerYBound = est.Y - BORDER;
+            foreach (ObjectEstimate est in _RealState)
+                if (est.Y - BORDER < LowerYBound)
+                    LowerYBound = est.Y - BORDER;
             foreach (Sensor Sen in _Sensors)
                 if (Sen.Y - BORDER < LowerYBound)
                     LowerYBound = Sen.Y - BORDER;
@@ -219,6 +233,9 @@ namespace DisplayServer
                 if (est.Y + BORDER > UpperYBound)
                     UpperYBound = est.Y + BORDER;
             foreach (ObjectEstimate est in _AdditionalStateInfo)
+                if (est.Y + BORDER > UpperYBound)
+                    UpperYBound = est.Y + BORDER;
+            foreach (ObjectEstimate est in _RealState)
                 if (est.Y + BORDER > UpperYBound)
                     UpperYBound = est.Y + BORDER;
             foreach (Sensor Sen in _Sensors)

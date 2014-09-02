@@ -21,6 +21,7 @@ namespace SensorServer
         static Mutex RawDataMutex = new Mutex(false);
         static MeasurementStore MeasureStore;
         static readonly string MEASUREMENTSTORE_CSV_FILE = Variables.GetSensorServerMeasureStoreFilePath(INIFile);
+        static SensorServerMode Mode;
 
         static Dictionary<int, Sensor> GetSensorDictionary()
         {
@@ -109,7 +110,6 @@ namespace SensorServer
 
         static void Main()
         {
-            SensorServerMode Mode;
             try
             {
                 Mode = Variables.GetSensorServerMode(INIFile);
@@ -218,7 +218,13 @@ namespace SensorServer
                     }
                     List<ObjectEstimate> RawMeasurementEstimate = RawMeasurementEstimator.ComputeEstimate();
                     List<ObjectEstimate> ObjectCandidateEstimate = ObjectCandidateEstimator.ComputeEstimate();
-                    Sender.SendData(RawMeasurementEstimate, ObjectCandidateEstimate, ObjectCandidateEstimator.CurrAdditionalInfo);
+                    List<ObjectEstimate> RealState = new List<ObjectEstimate>();
+                    if (Mode == SensorServerMode.ReadFromStore)
+                    {
+                        //TODO: Make class that gets state from file
+                        RealState.Add(new ObjectEstimate(0, 0, 0, 0));
+                    }
+                    Sender.SendData(RawMeasurementEstimate, ObjectCandidateEstimate, ObjectCandidateEstimator.CurrAdditionalInfo, RealState);
                     Console.WriteLine("Data for time stage {0} sent to display server", CurrTimeStage);
                 }
 

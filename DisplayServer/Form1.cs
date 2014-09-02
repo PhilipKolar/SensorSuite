@@ -39,7 +39,7 @@ namespace DisplayServer
             }
         }
 
-        public void MessageReceived(List<ObjectEstimate> rawData, List<ObjectEstimate> stateEstimate, List<ObjectEstimate> additionalStateInfo)
+        public void MessageReceived(List<ObjectEstimate> rawData, List<ObjectEstimate> stateEstimate, List<ObjectEstimate> additionalStateInfo, List<ObjectEstimate> realState)
         {
             if (rawData == null)
                 rawData = new List<ObjectEstimate>();
@@ -47,12 +47,14 @@ namespace DisplayServer
                 stateEstimate = new List<ObjectEstimate>();
             if (additionalStateInfo == null)
                 additionalStateInfo = new List<ObjectEstimate>();
-            DrawingMutex.WaitOne();
+            if (realState == null)
+                realState = new List<ObjectEstimate>();
 
+            DrawingMutex.WaitOne();
             if (Drawer == null)
-                Drawer = new StateDrawer(rawData, stateEstimate, additionalStateInfo, picCurrState.Width, picCurrState.Height, CSVFile, Variables.GetDrawDisplayServerDrawXY1To1(INIFile));
+                Drawer = new StateDrawer(rawData, stateEstimate, additionalStateInfo, realState, picCurrState.Width, picCurrState.Height, CSVFile, Variables.GetDrawDisplayServerDrawXY1To1(INIFile));
             else
-                Drawer.SetStates(rawData, stateEstimate, additionalStateInfo);
+                Drawer.SetStates(rawData, stateEstimate, additionalStateInfo, realState);
             Bitmap Bmp = Drawer.DrawState();
 
             Bitmap BmpCopy = (Bitmap)Bmp.Clone(); // Need a copy in order to Save() and display it at the same time, since Bitmap is not a thread safe class

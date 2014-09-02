@@ -49,29 +49,40 @@ namespace SensorServer
             ConnectionEstablished.Release();
         }
 
-        public void SendData(List<ObjectEstimate> rawDataToSend, List<ObjectEstimate> stateToSend, List<ObjectEstimate> additionalInfoToSend)
+        public void SendData(List<ObjectEstimate> rawDataToSend, List<ObjectEstimate> stateToSend, List<ObjectEstimate> additionalInfoToSend, List<ObjectEstimate> realState)
         {
             if (!Connected)
                 throw new Exception("Could not send message to listener, not currently connected.");
 
             BinaryFormatter Formatter = new BinaryFormatter();
+
             MemoryStream RawDataStream = new MemoryStream();
             MemoryStream StateStream = new MemoryStream();
             MemoryStream AdditionalInfoStream = new MemoryStream();
+            MemoryStream RealStateStream = new MemoryStream();
+
             Formatter.Serialize(RawDataStream, rawDataToSend);
             Formatter.Serialize(StateStream, stateToSend);
             Formatter.Serialize(AdditionalInfoStream, additionalInfoToSend);
-            byte[] DataToSend = new byte[4 + RawDataStream.Length + 4 + StateStream.Length + 4 + AdditionalInfoStream.Length]; //Each 4 bytes is for an int representing size of stream (e.g. RawDataStream)
+            Formatter.Serialize(RealStateStream, realState);
+
+            byte[] DataToSend = new byte[4 + RawDataStream.Length + 4 + StateStream.Length + 4 + AdditionalInfoStream.Length + 4 + RealStateStream.Length]; //Each 4 bytes is for an int representing size of stream (e.g. RawDataStream)
+
+            //Copy in the contents of the lists to DataToSend
             RawDataStream.Position = 0;
             RawDataStream.Read(DataToSend, 4, (int)RawDataStream.Length);
             StateStream.Position = 0;
             StateStream.Read(DataToSend, 4 + (int)RawDataStream.Length + 4, (int)StateStream.Length);
             AdditionalInfoStream.Position = 0;
             AdditionalInfoStream.Read(DataToSend, 4 + (int)RawDataStream.Length + 4 + (int)StateStream.Length + 4, (int)AdditionalInfoStream.Length);
+            RealStateStream.Position = 0;
+            RealStateStream.Read(DataToSend, 4 + (int)RawDataStream.Length + 4 + (int)StateStream.Length + 4 + (int)AdditionalInfoStream.Length + 4, (int)RealStateStream.Length);
 
-            Array.Copy(BitConverter.GetBytes((int)RawDataStream.Length), 0, DataToSend, 0, 4); //Copy in the length of rawDataToSend
-            Array.Copy(BitConverter.GetBytes((int)StateStream.Length), 0, DataToSend, 4 + (int)RawDataStream.Length, 4); //Copy in the length of statetoSend
-            Array.Copy(BitConverter.GetBytes((int)AdditionalInfoStream.Length), 0, DataToSend, 4 + (int)RawDataStream.Length + 4 + (int)StateStream.Length, 4); //Copy in the length of additionalInfoToSend
+            //Copy in the length of the lists to DataToSend
+            Array.Copy(BitConverter.GetBytes((int)RawDataStream.Length), 0, DataToSend, 0, 4);
+            Array.Copy(BitConverter.GetBytes((int)StateStream.Length), 0, DataToSend, 4 + (int)RawDataStream.Length, 4);
+            Array.Copy(BitConverter.GetBytes((int)AdditionalInfoStream.Length), 0, DataToSend, 4 + (int)RawDataStream.Length + 4 + (int)StateStream.Length, 4);
+            Array.Copy(BitConverter.GetBytes((int)RealStateStream.Length), 0, DataToSend, 4 + (int)RawDataStream.Length + 4 + (int)StateStream.Length + 4 + (int)AdditionalInfoStream.Length, 4);
 
             if (_ListenerStream == null) //Runs the first time only
                 _ListenerStream = _ClientConnection.GetStream();
@@ -83,7 +94,7 @@ namespace SensorServer
         {
             try
             {
-                SendData(new List<ObjectEstimate>(), new List<ObjectEstimate>(), new List<ObjectEstimate>()); //Send an end sequence to the server before finishing
+                SendData(new List<ObjectEstimate>(), new List<ObjectEstimate>(), new List<ObjectEstimate>(), new List<ObjectEstimate>()); //Send an end sequence to the server before finishing
             }
             catch (Exception ex)
             {

@@ -12,7 +12,7 @@ using System.Windows.Forms;
 
 namespace DisplayServer //TODO: Change console.WriteLine()'s to something in the form
 {
-    public delegate void MessageReceievedDelegate(List<ObjectEstimate> RawData, List<ObjectEstimate> StateEstimate, List<ObjectEstimate> AdditionalStateInfo );
+    public delegate void MessageReceievedDelegate(List<ObjectEstimate> RawData, List<ObjectEstimate> StateEstimate, List<ObjectEstimate> AdditionalStateInfo, List<ObjectEstimate> RealState);
     class DisplayReceiver
     {
         private IPAddress _ServerIP;
@@ -79,25 +79,28 @@ namespace DisplayServer //TODO: Change console.WriteLine()'s to something in the
                 //Retrieve the raw data from the network stream
                 byte[] RawDataSizeBuffer = new byte[4];
                 _WaitAndRead(ListenerStream, RawDataSizeBuffer, RawDataSizeBuffer.Length);
-                //ListenerStream.Read(RawDataSizeBuffer, 0, RawDataSizeBuffer.Length);
                 int RawDataSize = BitConverter.ToInt32(RawDataSizeBuffer, 0);
                 byte[] RawDataBuffer = new byte[RawDataSize];
                 _WaitAndRead(ListenerStream, RawDataBuffer, RawDataSize);
-                //ListenerStream.Read(RawDataBuffer, 0, RawDataSize);
-
-                //Retrieve the state estiamtion data from the network stream
+                //Retrieve the state estimation data from the network stream
                 byte[] StateSizeBuffer = new byte[4];
                 _WaitAndRead(ListenerStream, StateSizeBuffer, StateSizeBuffer.Length);
                 int StateSize = BitConverter.ToInt32(StateSizeBuffer, 0);
                 byte[] StateBuffer = new byte[StateSize];
                 _WaitAndRead(ListenerStream, StateBuffer, StateSize);
-
-                //Retrieve the additional state estiamtion data from the network stream
+                //Retrieve the additional state estimation data from the network stream
                 byte[] AdditionalStateSizeBuffer = new byte[4];
                 _WaitAndRead(ListenerStream, AdditionalStateSizeBuffer, AdditionalStateSizeBuffer.Length);
                 int AdditionalStateSize = BitConverter.ToInt32(AdditionalStateSizeBuffer, 0);
                 byte[] AdditionalStateBuffer = new byte[AdditionalStateSize];
                 _WaitAndRead(ListenerStream, AdditionalStateBuffer, AdditionalStateSize);
+                //Retrieve the real state data from the network stream
+                byte[] RealStateSizeBuffer = new byte[4];
+                _WaitAndRead(ListenerStream, RealStateSizeBuffer, RealStateSizeBuffer.Length);
+                int RealStateSize = BitConverter.ToInt32(RealStateSizeBuffer, 0);
+                byte[] RealStateBuffer = new byte[RealStateSize];
+                _WaitAndRead(ListenerStream, RealStateBuffer, RealStateSize);
+
 
                 //Check for an end sequence //TODO: FIX!
                 //if (RawDataSize == 330 && StateSize == 330) //An empty list of ObjectEstimates will be 330 bytes
@@ -117,19 +120,23 @@ namespace DisplayServer //TODO: Change console.WriteLine()'s to something in the
                 RawDataStream.Write(RawDataBuffer, 0, RawDataBuffer.Length);
                 RawDataStream.Position = 0;
                 List<ObjectEstimate> RawDataList = (List<ObjectEstimate>)Formatter.Deserialize(RawDataStream);
-
                 //Deserialise the state estimate data into its original List<ObjectEsimate> form
                 MemoryStream StateStream = new MemoryStream();
                 StateStream.Write(StateBuffer, 0, StateBuffer.Length);
                 StateStream.Position = 0;
                 List<ObjectEstimate> StateList = (List<ObjectEstimate>)Formatter.Deserialize(StateStream);
-
+                //Deserialise the additional state estimation data into its original List<ObjectEsimate> form
                 MemoryStream AdditionalStateStream = new MemoryStream();
                 AdditionalStateStream.Write(AdditionalStateBuffer, 0, AdditionalStateBuffer.Length);
                 AdditionalStateStream.Position = 0;
                 List<ObjectEstimate> AdditionalStateList = (List<ObjectEstimate>)Formatter.Deserialize(AdditionalStateStream);
+                //Deserialise the real state data into its original List<ObjectEsimate> form
+                MemoryStream RealStateStream = new MemoryStream();
+                RealStateStream.Write(RealStateBuffer, 0, RealStateBuffer.Length);
+                RealStateStream.Position = 0;
+                List<ObjectEstimate> RealStateList = (List<ObjectEstimate>)Formatter.Deserialize(RealStateStream);
 
-                OnMessageReceived(RawDataList, StateList, AdditionalStateList);
+                OnMessageReceived(RawDataList, StateList, AdditionalStateList, RealStateList);
             }
         }
 
