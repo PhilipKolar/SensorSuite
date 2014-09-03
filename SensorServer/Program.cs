@@ -205,6 +205,10 @@ namespace SensorServer
 
             IEstimator RawMeasurementEstimator = new ForwardEstimator();
             IEstimator ObjectCandidateEstimator = new InitialEstimator(INIFile);
+
+            RealStateParser RealParser = null;
+            if (Mode == SensorServerMode.ReadFromStore)
+                RealParser = new RealStateParser(Variables.GetSensorServerRealStateFilePath(INIFile));
             while (true)
             {
                 List<Measurement> CurrStageMeasurements = GetTimeStageMeasurements(CurrTimeStage);
@@ -221,8 +225,9 @@ namespace SensorServer
                     List<ObjectEstimate> RealState = new List<ObjectEstimate>();
                     if (Mode == SensorServerMode.ReadFromStore)
                     {
-                        //TODO: Make class that gets state from file
-                        RealState.Add(new ObjectEstimate(0, 0, 0, 0));
+                        ObjectEstimate RealStateObject = RealParser.GetState(StartTime + new TimeSpan(0, 0, 0, 0, PollingDelay * CurrTimeStage));
+                        if (RealStateObject != null)
+                            RealState.Add(RealStateObject);
                     }
                     Sender.SendData(RawMeasurementEstimate, ObjectCandidateEstimate, ObjectCandidateEstimator.CurrAdditionalInfo, RealState);
                     Console.WriteLine("Data for time stage {0} sent to display server", CurrTimeStage);

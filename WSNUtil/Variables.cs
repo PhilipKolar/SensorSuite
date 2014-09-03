@@ -32,6 +32,11 @@ namespace WSNUtil
             }
         }
 
+        public static string GetSensorServerRealStateFilePath(string iniFile)
+        {
+            return ConfigFileParser.RetrieveString("SENSOR_SERVER_REAL_STATE", iniFile);
+        }
+
         public static bool GetSensorServerTrilateratorNoiseless0DAveragingAnchor(string iniFile)
         {
             return ConfigFileParser.RetrieveBool("TRILATERATOR_NOISELESS_0D_AVERAGING_ANCHOR", iniFile);

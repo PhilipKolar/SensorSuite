@@ -26,3 +26,5 @@ C:\Users\phili_000\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\Sensor
 C:\Users\phili_000\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\SensorServer\obj\Debug\SensorServer.csprojResolveAssemblyReference.cache
 C:\Users\phili_000\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\SensorServer\obj\Debug\SensorServer.exe
 C:\Users\phili_000\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\SensorServer\obj\Debug\SensorServer.pdb
+C:\Users\phili_000\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\SensorServer\obj\Debug\Interop.MLApp.dll
+C:\Users\phili_000\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\SensorServer\obj\Debug\SensorServer.csproj.ResolveComReference.cache

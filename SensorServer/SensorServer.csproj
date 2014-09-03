@@ -49,6 +49,7 @@
     <Compile Include="Estimators\Tools\Trilaterator.cs" />
     <Compile Include="Estimators\Tools\TrilateratorNoiseless0D.cs" />
     <Compile Include="MeasurementStore.cs" />
+    <Compile Include="RealStateParser.cs" />
     <Compile Include="SensorReceiver.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
