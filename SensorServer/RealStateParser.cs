@@ -26,6 +26,7 @@ namespace SensorServer
             Reader.BaseStream.Position = 0;
             Reader.DiscardBufferedData();
             _Motions = _GetMotions(Reader, true);
+            Reader.Close();
         }
 
         public ObjectEstimate GetState(DateTime time)

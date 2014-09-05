@@ -211,6 +211,7 @@ namespace SensorServer
                 RealParser = new RealStateParser(Variables.GetSensorServerRealStateFilePath(INIFile));
             while (true)
             {
+                WaitForNewMeasurements(TOLERANCE_LAG, CurrTimeStage);
                 List<Measurement> CurrStageMeasurements = GetTimeStageMeasurements(CurrTimeStage);
 
                 if (CurrStageMeasurements.Count != 0)
@@ -234,16 +235,49 @@ namespace SensorServer
                 }
 
                 RemoveTimeStageMeasurements(CurrTimeStage);
-                // Wait a delay equal to the PollingDelay to give sensors time to take and send their measurements
-                if (StartTime != DateTime.MinValue)
+                CurrTimeStage++;
+            }
+        }
+
+        static void WaitForNewMeasurements(int lag_ms, int nextTimestage)
+        {
+            int SleepTime = PollingDelay / 10 > 0 ? PollingDelay / 10 : 1;
+
+            //Wait for first measurement to come in
+            while (StartTime == DateTime.MinValue)
+            {
+                Thread.Sleep(SleepTime);
+            }
+
+            //Wait for the lag
+            DateTime TimeToWaitFor = LocalStartTime + new TimeSpan(0, 0, 0, 0, lag_ms + nextTimestage * PollingDelay);
+            while (DateTime.Now < TimeToWaitFor)
+            {
+                Thread.Sleep(SleepTime);
+            }
+            
+            //Wait until there are measurements with sufficiently
+            bool Found = false;
+            while (true)
+            {
+                RawDataMutex.WaitOne();
+                foreach (KeyValuePair<int, List<Measurement>> kvp in RawData)
                 {
-                    DateTime ExpectedTime = LocalStartTime.AddMilliseconds(TOLERANCE_LAG + PollingDelay * (CurrTimeStage + 1));
-                    int SleepTime = DateTime.Now > ExpectedTime ? 0 : PollingDelay;
-                    Thread.Sleep(SleepTime); //Don't wait for the polling delay if we are behind schedule.
-                    CurrTimeStage++;
+                    foreach (Measurement m in kvp.Value)
+                    {
+                        if (m.TimeStage >= nextTimestage)
+                        {
+                            Found = true;
+                            break;
+                        }
+                    }
+                    if (Found)
+                        break;
                 }
-                else
-                    Thread.Sleep(PollingDelay);
+                RawDataMutex.ReleaseMutex();
+                if (Found)
+                    break;
+                Thread.Sleep(SleepTime); //Sleep so we give RawData some time to fill up, i.e. we don't want to constantly hold RawDataMutex
             }
         }
     } // End class

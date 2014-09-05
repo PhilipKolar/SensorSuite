@@ -62,6 +62,7 @@ namespace DisplayServer
             Graphics Gfx = Graphics.FromImage(Bmp);
             Gfx.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
+            _DrawBackground(Gfx, Brushes.WhiteSmoke);
             _DrawAxes(Gfx);
             foreach (Sensor Sen in _Sensors)
                 _DrawSensor(Gfx, Sen);
@@ -75,6 +76,11 @@ namespace DisplayServer
                 _DrawObject(Gfx, Obj, Brushes.Gray, 8f);
 
             return Bmp;
+        }
+
+        private void _DrawBackground(Graphics gfx, Brush color)
+        {
+            gfx.FillRectangle(color, 0, 0, Width, Height);
         }
 
         private void _DrawAxes(Graphics gfx)
