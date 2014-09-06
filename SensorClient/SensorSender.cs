@@ -16,8 +16,14 @@ namespace SensorClient
         private int _PortNo;
         private TcpClient _ClientConnection;
         private NetworkStream _ListenerStream;
-        public Semaphore ConnectionEstablished = new Semaphore(0, 1); //TODO: Change to readonly property
+        private Semaphore _ConnectionEstablished = new Semaphore(0, 1);
         public int SensorID { get; private set; }
+
+        public void WaitForConnection()
+        {
+            _ConnectionEstablished.WaitOne();
+            _ConnectionEstablished.Release();
+        }
 
         public bool Connected
         {
@@ -73,7 +79,7 @@ namespace SensorClient
                 }
                 _AttemptingConnection = false;
                 CanSend = true;
-                ConnectionEstablished.Release();
+                _ConnectionEstablished.Release();
             }
             else
                 Console.WriteLine("Already connected or connecting, _InitConnection() aborting");
@@ -85,7 +91,7 @@ namespace SensorClient
             _ClientConnection = null;
             _ListenerStream = null;
             CanSend = false;
-            ConnectionEstablished = new Semaphore(0, 1);
+            _ConnectionEstablished = new Semaphore(0, 1);
         }
 
         public void SendData(float distance, DateTime timeStamp)

@@ -72,7 +72,7 @@ namespace SensorClient.Schedulers
                 Console.WriteLine("Attempting to connect to server at {0}...", Variables.GetSensorServerIP(INIFile));
                 _Sender = new SensorSender(SensorID, INIFile);
                 _Sender.Start();
-                _Sender.ConnectionEstablished.WaitOne();
+                _Sender._ConnectionEstablished.WaitOne();
             } while (!_Sender.Connected);
             Console.WriteLine("Connected to SensorServer. Now sending data.");
             if (TimeDivison)

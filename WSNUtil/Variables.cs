@@ -32,6 +32,11 @@ namespace WSNUtil
             }
         }
 
+        public static int GetSensorServerMeasurementWaitLag(string iniFile)
+        {
+            return ConfigFileParser.RetrieveInt("SENSOR_SERVER_MEASUREMENT_WAIT_LAG", iniFile);
+        }
+
         public static string GetSensorServerRealStateFilePath(string iniFile)
         {
             return ConfigFileParser.RetrieveString("SENSOR_SERVER_REAL_STATE", iniFile);

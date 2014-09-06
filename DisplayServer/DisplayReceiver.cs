@@ -21,7 +21,14 @@ namespace DisplayServer //TODO: Change console.WriteLine()'s to something in the
         private Dictionary<TcpClient, NetworkStream> _ClientStreams;
         private Semaphore _ConcurrentConnectionLimit = new Semaphore(1, 1);
         private TextBox _OutputTextbox;
-        public Semaphore ConnectionEstablishedSemaphore = new Semaphore(0, 1);
+        private Semaphore _ConnectionEstablishedSemaphore = new Semaphore(0, 1);
+
+        public void WaitForConnection()
+        {
+            _ConnectionEstablishedSemaphore.WaitOne();
+            _ConnectionEstablishedSemaphore.Release();
+        }
+
         public string ClientIP { get; private set; }
         
         public event MessageReceievedDelegate OnMessageReceived;
@@ -61,7 +68,7 @@ namespace DisplayServer //TODO: Change console.WriteLine()'s to something in the
                 ClientIP = _GetIP(Client).ToString();
                 NetworkStream ListenerStream = Client.GetStream();
                 _ClientStreams.Add(Client, ListenerStream);
-                ConnectionEstablishedSemaphore.Release();
+                _ConnectionEstablishedSemaphore.Release();
 
                 Thread NewMonitoringStream = new Thread(new ParameterizedThreadStart(_MonitorStream));
                 NewMonitoringStream.Start(new Tuple<TcpClient, NetworkStream> (Client, ListenerStream));

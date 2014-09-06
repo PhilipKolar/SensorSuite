@@ -117,7 +117,7 @@ namespace DisplayServer
             InitStateHistoryFile();
             Receiver.Start();
 
-            Receiver.ConnectionEstablishedSemaphore.WaitOne();
+            Receiver.WaitForConnection();
             lblMessageCount.Invoke((MethodInvoker)(() => lblMessageCount.Text = "0"));
             lblStatus.Invoke((MethodInvoker)(() => lblStatus.Text = "Connected"));
             lblStatus.Invoke((MethodInvoker)(() => lblStatus.ForeColor = Color.Green));

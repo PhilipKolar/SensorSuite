@@ -17,7 +17,13 @@ namespace SensorServer
         private int _PortNo;
         private TcpClient _ClientConnection;
         private NetworkStream _ListenerStream;
-        public Semaphore ConnectionEstablished = new Semaphore(0, 1);
+        private Semaphore _ConnectionEstablished = new Semaphore(0, 1);
+
+        public void WaitForConnection()
+        {
+            _ConnectionEstablished.WaitOne();
+            _ConnectionEstablished.Release();
+        }
 
         public bool Connected
         {
@@ -46,7 +52,7 @@ namespace SensorServer
             {
                 Console.WriteLine(string.Format("Failed to connect to {0}. Exception message: {1}", _ServerIP.ToString(), ex.Message));
             }
-            ConnectionEstablished.Release();
+            _ConnectionEstablished.Release();
         }
 
         public void SendData(List<ObjectEstimate> rawDataToSend, List<ObjectEstimate> stateToSend, List<ObjectEstimate> additionalInfoToSend, List<ObjectEstimate> realState)

@@ -22,6 +22,8 @@ namespace SensorServer
         static MeasurementStore MeasureStore;
         static readonly string MEASUREMENTSTORE_CSV_FILE = Variables.GetSensorServerMeasureStoreFilePath(INIFile);
         static SensorServerMode Mode;
+        static int LargestTimeStage = -1;
+        static Mutex LargestTimeStageMutex = new Mutex(false);
 
         static Dictionary<int, Sensor> GetSensorDictionary()
         {
@@ -49,14 +51,18 @@ namespace SensorServer
             RawDataMutex.ReleaseMutex();
             int TimeDifferenceMilliseconds = (int)((timeStamp.Ticks - StartTime.Ticks) / TimeSpan.TicksPerMillisecond); // Ticks represent 100 us (nanoseconds), divide by 10,000 to get ms (the same as PollingDelay).
             int TimeStage = (int)Math.Round((double)TimeDifferenceMilliseconds / PollingDelay, 0, MidpointRounding.AwayFromZero);
+
             Measurement ReceivedMeasurement = new Measurement(distance, timeStamp, sensorID, TimeStage);
             RawDataMutex.WaitOne();
             CurrentList.Add(ReceivedMeasurement);
             RawDataMutex.ReleaseMutex();
-            Console.WriteLine("Data Received:\n\tSensor ID: '{3}'\n\tTime Stage: '{4}'\n\tDistance: '{0}'\n\tTicks: '{1}', DateTime: '{2}'\n", distance, timeStamp.Ticks, timeStamp.ToString(), sensorID, TimeStage); //TODO: Delete this when no longer needed for testing
-            //EstimatorMutex.WaitOne();
-            //Estimator.AddMeasurement(SensorList[ReceivedMeasurement.SensorID], ReceivedMeasurement);
-            //EstimatorMutex.ReleaseMutex();
+
+            LargestTimeStageMutex.WaitOne();
+            LargestTimeStage = TimeStage > LargestTimeStage ? TimeStage : LargestTimeStage; //Update LargestTimeStageAvailable if needed.
+            LargestTimeStageMutex.ReleaseMutex();
+
+            //Console.WriteLine("Data Received:\n\tSensor ID: '{3}'\n\tTime Stage: '{4}'\n\tDistance: '{0}'\n\tTicks: '{1}', DateTime: '{2}'\n", distance, timeStamp.Ticks, timeStamp.ToString(), sensorID, TimeStage);
+            Console.WriteLine("Data Received: Sensor ID: '{0}' Distance: '{1}'", sensorID, distance); //Less verbose than above line
         }
 
         static void MeasurementReceivedReadFromStore(int sensorID, float distance, DateTime timeStamp)
@@ -71,6 +77,10 @@ namespace SensorServer
             int TimeStage = (int)Math.Round((double)TimeDifferenceMilliseconds / PollingDelay, 0, MidpointRounding.AwayFromZero);
             Measurement ReceivedMeasurement = new Measurement(distance, timeStamp, sensorID, TimeStage);
             MeasureStore.Enqueue(ReceivedMeasurement, TimeReceived);
+
+            LargestTimeStageMutex.WaitOne();
+            LargestTimeStage = TimeStage > LargestTimeStage ? TimeStage : LargestTimeStage; //Update LargestTimeStageAvailable if needed.
+            LargestTimeStageMutex.ReleaseMutex();
         }
 
         static List<Measurement> GetTimeStageMeasurements(int TimeStage)
@@ -96,6 +106,7 @@ namespace SensorServer
         static void RemoveTimeStageMeasurements(int timestage)
         {
             RawDataMutex.WaitOne();
+            bool AllListsEmpty = true;
             foreach (KeyValuePair<int, List<Measurement>> sensorMeasurements in RawData)
             {
                 while (sensorMeasurements.Value.Count != 0)
@@ -104,8 +115,17 @@ namespace SensorServer
                         break;
                     sensorMeasurements.Value.RemoveAt(0); //TODO: Change this operation, RemoveAt(0) is O(n) complexity as it shifts data elements down the array
                 }
+                if (sensorMeasurements.Value.Count != 0)
+                    AllListsEmpty = false;
             }
             RawDataMutex.ReleaseMutex();
+
+            if (AllListsEmpty)
+            {
+                LargestTimeStageMutex.WaitOne();
+                LargestTimeStage = -1;
+                LargestTimeStageMutex.ReleaseMutex();
+            }
         }
 
         static void Main()
@@ -197,10 +217,8 @@ namespace SensorServer
         {
             DisplaySender Sender = new DisplaySender(Variables.DefaultINILocation);
             Sender.Start();
-            const int TOLERANCE_LAG = 500; //Time to wait for sensor measurements before finalising an estimate. Measured in ms.
-            Thread.Sleep(TOLERANCE_LAG); // Lag behind the sensors to wait for any slow communication.
-            Sender.ConnectionEstablished.WaitOne();
-            Sender.ConnectionEstablished.Release();
+            int DisplayLag_ms = Variables.GetSensorServerMeasurementWaitLag(INIFile); //Time to wait for sensor measurements before finalising an estimate. Measured in ms.
+            Sender.WaitForConnection();
             int CurrTimeStage = 0;
 
             IEstimator RawMeasurementEstimator = new ForwardEstimator();
@@ -211,7 +229,7 @@ namespace SensorServer
                 RealParser = new RealStateParser(Variables.GetSensorServerRealStateFilePath(INIFile));
             while (true)
             {
-                WaitForNewMeasurements(TOLERANCE_LAG, CurrTimeStage);
+                WaitForNewMeasurements(DisplayLag_ms, CurrTimeStage);
                 List<Measurement> CurrStageMeasurements = GetTimeStageMeasurements(CurrTimeStage);
 
                 if (CurrStageMeasurements.Count != 0)
@@ -241,7 +259,7 @@ namespace SensorServer
 
         static void WaitForNewMeasurements(int lag_ms, int nextTimestage)
         {
-            int SleepTime = PollingDelay / 10 > 0 ? PollingDelay / 10 : 1;
+            int SleepTime = PollingDelay / 5 > 0 ? PollingDelay / 5 : 1;
 
             //Wait for first measurement to come in
             while (StartTime == DateTime.MinValue)
@@ -257,28 +275,15 @@ namespace SensorServer
             }
             
             //Wait until there are measurements with sufficiently
-            bool Found = false;
             while (true)
             {
-                RawDataMutex.WaitOne();
-                foreach (KeyValuePair<int, List<Measurement>> kvp in RawData)
-                {
-                    foreach (Measurement m in kvp.Value)
-                    {
-                        if (m.TimeStage >= nextTimestage)
-                        {
-                            Found = true;
-                            break;
-                        }
-                    }
-                    if (Found)
-                        break;
-                }
-                RawDataMutex.ReleaseMutex();
-                if (Found)
+                LargestTimeStageMutex.WaitOne();
+                if (LargestTimeStage >= nextTimestage)
                     break;
-                Thread.Sleep(SleepTime); //Sleep so we give RawData some time to fill up, i.e. we don't want to constantly hold RawDataMutex
+                LargestTimeStageMutex.ReleaseMutex();
+                Thread.Sleep(SleepTime);
             }
+            LargestTimeStageMutex.ReleaseMutex();
         }
     } // End class
 } // End namespace
