@@ -49,7 +49,7 @@ namespace SensorClient.Schedulers
                 _ConsoleOutputMutex.ReleaseMutex();
                 _Sender = new SensorSender(SensorId, INIFile);
                 _Sender.Start();
-                _Sender._ConnectionEstablished.WaitOne();
+                _Sender.WaitForConnection();
             } while (!_Sender.Connected);
             Console.WriteLine("Connection established.");
 
