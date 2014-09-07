@@ -32,6 +32,11 @@ namespace WSNUtil
             }
         }
 
+        public static bool GetSensorServerUseInitialMeasurementAsState(string iniFile)
+        {
+            return ConfigFileParser.RetrieveBool("USE_INITIAL_MEASUREMENT_AS_STATE", iniFile);
+        }
+
         public static int GetSensorServerMeasurementWaitLag(string iniFile)
         {
             return ConfigFileParser.RetrieveInt("SENSOR_SERVER_MEASUREMENT_WAIT_LAG", iniFile);
@@ -56,10 +61,34 @@ namespace WSNUtil
         {
             return ConfigFileParser.RetrieveBool("DRAW_XY_AXIS_1_TO_1", iniFile);
         }
+        public static bool GetDisplayServerDrawReal(string iniFile)
+        {
+            return ConfigFileParser.RetrieveBool("DRAW_REAL", iniFile);
+        }
 
         public static bool GetDisplayServerDrawAdditional(string iniFile)
         {
             return ConfigFileParser.RetrieveBool("DRAW_ADDITIONAL", iniFile);
+        }
+
+        public static bool GetDisplayServerDrawEsimated(string iniFile)
+        {
+            return ConfigFileParser.RetrieveBool("DRAW_ESTIMTAED", iniFile);
+        }
+
+        public static bool GetDisplayServerDrawTrilaterated(string iniFile)
+        {
+            return ConfigFileParser.RetrieveBool("DRAW_TRILATERATED", iniFile);
+        }
+
+        public static bool GetDisplayServerDrawMeasurements(string iniFile)
+        {
+            return ConfigFileParser.RetrieveBool("DRAW_MEASUREMENTS", iniFile);
+        }
+
+        public static bool GetDisplayServerDrawSensors(string iniFile)
+        {
+            return ConfigFileParser.RetrieveBool("DRAW_SENSORS", iniFile);
         }
 
         /// <summary>

@@ -55,7 +55,7 @@ namespace SensorServer
             _ConnectionEstablished.Release();
         }
 
-        public void SendData(List<ObjectEstimate> rawDataToSend, List<ObjectEstimate> stateToSend, List<ObjectEstimate> additionalInfoToSend, List<ObjectEstimate> realState)
+        public void SendData(List<ObjectEstimate> rawDataToSend, List<ObjectEstimate> stateToSend, List<ObjectEstimate> additionalInfoToSend, List<ObjectEstimate> realState, List<ObjectEstimate> trilateredEstimates)
         {
             if (!Connected)
                 throw new Exception("Could not send message to listener, not currently connected.");
@@ -66,13 +66,16 @@ namespace SensorServer
             MemoryStream StateStream = new MemoryStream();
             MemoryStream AdditionalInfoStream = new MemoryStream();
             MemoryStream RealStateStream = new MemoryStream();
+            MemoryStream trilateratedStream = new MemoryStream();
 
             Formatter.Serialize(RawDataStream, rawDataToSend);
             Formatter.Serialize(StateStream, stateToSend);
             Formatter.Serialize(AdditionalInfoStream, additionalInfoToSend);
             Formatter.Serialize(RealStateStream, realState);
+            Formatter.Serialize(trilateratedStream, trilateredEstimates);
 
-            byte[] DataToSend = new byte[4 + RawDataStream.Length + 4 + StateStream.Length + 4 + AdditionalInfoStream.Length + 4 + RealStateStream.Length]; //Each 4 bytes is for an int representing size of stream (e.g. RawDataStream)
+            //Each 4 bytes is for an int representing size of stream (e.g. RawDataStream)
+            byte[] DataToSend = new byte[4 + RawDataStream.Length + 4 + StateStream.Length + 4 + AdditionalInfoStream.Length + 4 + RealStateStream.Length + 4 + trilateratedStream.Length];
 
             //Copy in the contents of the lists to DataToSend
             RawDataStream.Position = 0;
@@ -83,12 +86,15 @@ namespace SensorServer
             AdditionalInfoStream.Read(DataToSend, 4 + (int)RawDataStream.Length + 4 + (int)StateStream.Length + 4, (int)AdditionalInfoStream.Length);
             RealStateStream.Position = 0;
             RealStateStream.Read(DataToSend, 4 + (int)RawDataStream.Length + 4 + (int)StateStream.Length + 4 + (int)AdditionalInfoStream.Length + 4, (int)RealStateStream.Length);
+            trilateratedStream.Position = 0;
+            trilateratedStream.Read(DataToSend, 4 + (int)RawDataStream.Length + 4 + (int)StateStream.Length + 4 + (int)AdditionalInfoStream.Length + 4 + (int)RealStateStream.Length + 4, (int)trilateratedStream.Length);
 
-            //Copy in the length of the lists to DataToSend
+            //Copy in the lengths of the lists to DataToSend
             Array.Copy(BitConverter.GetBytes((int)RawDataStream.Length), 0, DataToSend, 0, 4);
             Array.Copy(BitConverter.GetBytes((int)StateStream.Length), 0, DataToSend, 4 + (int)RawDataStream.Length, 4);
             Array.Copy(BitConverter.GetBytes((int)AdditionalInfoStream.Length), 0, DataToSend, 4 + (int)RawDataStream.Length + 4 + (int)StateStream.Length, 4);
             Array.Copy(BitConverter.GetBytes((int)RealStateStream.Length), 0, DataToSend, 4 + (int)RawDataStream.Length + 4 + (int)StateStream.Length + 4 + (int)AdditionalInfoStream.Length, 4);
+            Array.Copy(BitConverter.GetBytes((int)trilateratedStream.Length), 0, DataToSend, 4 + (int)RawDataStream.Length + 4 + (int)StateStream.Length + 4 + (int)AdditionalInfoStream.Length + 4 + (int)RealStateStream.Length, 4);
 
             if (_ListenerStream == null) //Runs the first time only
                 _ListenerStream = _ClientConnection.GetStream();
@@ -100,7 +106,7 @@ namespace SensorServer
         {
             try
             {
-                SendData(new List<ObjectEstimate>(), new List<ObjectEstimate>(), new List<ObjectEstimate>(), new List<ObjectEstimate>()); //Send an end sequence to the server before finishing
+                SendData(new List<ObjectEstimate>(), new List<ObjectEstimate>(), new List<ObjectEstimate>(), new List<ObjectEstimate>(), new List<ObjectEstimate>()); //Send an end sequence to the server before finishing
             }
             catch (Exception ex)
             {

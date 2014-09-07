@@ -245,13 +245,14 @@ namespace SensorServer
                     List<ObjectEstimate> RawMeasurementEstimate = RawMeasurementEstimator.ComputeEstimate();
                     List<ObjectEstimate> ObjectCandidateEstimate = ObjectCandidateEstimator.ComputeEstimate();
                     List<ObjectEstimate> RealState = new List<ObjectEstimate>();
+                    List<ObjectEstimate> TrilateredEstimates = ObjectCandidateEstimator.TrilateratedEstimates;
                     if (Mode == SensorServerMode.ReadFromStore)
                     {
                         ObjectEstimate RealStateObject = RealParser.GetState(StartTime + new TimeSpan(0, 0, 0, 0, PollingDelay * CurrTimeStage));
                         if (RealStateObject != null)
                             RealState.Add(RealStateObject);
                     }
-                    Sender.SendData(RawMeasurementEstimate, ObjectCandidateEstimate, ObjectCandidateEstimator.CurrAdditionalInfo, RealState);
+                    Sender.SendData(RawMeasurementEstimate, ObjectCandidateEstimate, ObjectCandidateEstimator.CurrAdditionalInfo, RealState, TrilateredEstimates);
                     Console.WriteLine("Data for time stage {0} sent to display server", CurrTimeStage);
                 }
 

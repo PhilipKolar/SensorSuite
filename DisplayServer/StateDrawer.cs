@@ -13,6 +13,7 @@ namespace DisplayServer
         private List<ObjectEstimate> _StateEstimate; //List of estimated object positions to draw
         private List<ObjectEstimate> _AdditionalStateInfo; //List of addition object positions to draw
         private List<ObjectEstimate> _RealState; //List of real object positions to draw
+        private List<ObjectEstimate> _TrilateratedEstimate; //List of all valid trilateration results
         private List<Sensor> _Sensors; //List of sensors to draw (both their locations and FoVs)
         public float LowerXBound { get; private set; } //The minimum value in the X axis for the real world measurements
         public float UpperXBound { get; private set; } //The maximum value in the X axis for the real world measurements
@@ -25,33 +26,65 @@ namespace DisplayServer
         public int Width { get; private set; } //Width of the bitmap
         public int Height { get; private set; } //Height of the bitmap
         private bool _Draw1To1;
+        private bool _DrawRealPosition;
+        private bool _DrawAdditionalInfo;
+        private bool _DrawEstimatedPosition;
+        private bool _DrawTrilateratedPosition;
+        private bool _DrawMeasurements;
+        private bool _DrawSensors;
 
-        public StateDrawer(List<ObjectEstimate> rawData, List<ObjectEstimate> stateEstimate, List<ObjectEstimate> additionalStateInfo, List<ObjectEstimate> realState, int width, int height, string csvFile, bool draw1To1)
+        public StateDrawer(List<ObjectEstimate> rawData, List<ObjectEstimate> stateEstimate, List<ObjectEstimate> additionalStateInfo, List<ObjectEstimate> realState, List<ObjectEstimate> trilatereatedEstimate, int width, int height, string csvFile, string iniFile)
         {
-            _Draw1To1 = draw1To1;
+            _Draw1To1 = Variables.GetDrawDisplayServerDrawXY1To1(iniFile);
+            _DrawRealPosition = Variables.GetDisplayServerDrawReal(iniFile);
+            _DrawAdditionalInfo = Variables.GetDisplayServerDrawAdditional(iniFile);
+            _DrawEstimatedPosition = Variables.GetDisplayServerDrawEsimated(iniFile);
+            _DrawTrilateratedPosition = Variables.GetDisplayServerDrawTrilaterated(iniFile);
+            _DrawMeasurements = Variables.GetDisplayServerDrawMeasurements(iniFile);
+            _DrawSensors = Variables.GetDisplayServerDrawSensors(iniFile);
 
             Width = width;
             Height = height;
 
-            _RawData = rawData;
-            _StateEstimate = stateEstimate;
-            _AdditionalStateInfo = additionalStateInfo;
-            _RealState = realState;
-            _Sensors = Variables.GetSensorConfig(csvFile);
+            if (_DrawMeasurements)
+                _RawData = rawData;
+            else
+                _RawData = new List<ObjectEstimate>();
+            if (_DrawEstimatedPosition)
+                _StateEstimate = stateEstimate;
+            else
+                _StateEstimate = new List<ObjectEstimate>();
+            if (_DrawAdditionalInfo)
+                _AdditionalStateInfo = additionalStateInfo;
+            else
+                _AdditionalStateInfo = new List<ObjectEstimate>();
+            if (_DrawRealPosition)
+                _RealState = realState;
+            else
+                _RealState = new List<ObjectEstimate>();
+            if (_DrawTrilateratedPosition)
+                _TrilateratedEstimate = trilatereatedEstimate;
+            else
+                _TrilateratedEstimate = new List<ObjectEstimate>();
+            if (_DrawSensors)
+                _Sensors = Variables.GetSensorConfig(csvFile);
+            else
+                _Sensors = new List<Sensor>();
 
-            LowerXBound = -30;
-            UpperXBound = 30;
-            LowerYBound = -30;
-            UpperYBound = 30;
+            LowerXBound = -1;
+            UpperXBound = 1;
+            LowerYBound = -1;
+            UpperYBound = 1;
             _SetAllBounds();
         }
 
-        public void SetStates(List<ObjectEstimate> rawData, List<ObjectEstimate> stateEstimate, List<ObjectEstimate> additionalStateInfo, List<ObjectEstimate> realState)
+        public void SetStates(List<ObjectEstimate> rawData, List<ObjectEstimate> stateEstimate, List<ObjectEstimate> additionalStateInfo, List<ObjectEstimate> realState, List<ObjectEstimate> trilatereatedEstimate)
         {
             _RawData = rawData;
             _StateEstimate = stateEstimate;
             _AdditionalStateInfo = additionalStateInfo;
             _RealState = realState;
+            _TrilateratedEstimate = trilatereatedEstimate;
 
             _SetAllBounds();
         }
@@ -64,18 +97,33 @@ namespace DisplayServer
 
             _DrawBackground(Gfx, Brushes.WhiteSmoke);
             _DrawAxes(Gfx);
-            foreach (Sensor Sen in _Sensors)
-                _DrawSensor(Gfx, Sen);
-            foreach (ObjectEstimate Obj in _AdditionalStateInfo)
-                _DrawObject(Gfx, Obj, Brushes.Yellow, 15f);
-            foreach (ObjectEstimate Obj in _StateEstimate)
-                _DrawObject(Gfx, Obj, Brushes.Blue, 15f);
-            foreach (ObjectEstimate Obj in _RealState)
-                _DrawObject(Gfx, Obj, Brushes.Green, 15f);
-            foreach (ObjectEstimate Obj in _RawData)
-                _DrawObject(Gfx, Obj, Brushes.Gray, 8f);
+            _DrawLegend(Gfx);
+            if (_DrawSensors)
+                foreach (Sensor Sen in _Sensors)
+                    _DrawSensor(Gfx, Sen);
+            if (_DrawAdditionalInfo)
+                foreach (ObjectEstimate Obj in _AdditionalStateInfo)
+                    _DrawObject(Gfx, Obj, Brushes.Yellow, 15f);
+            if (_DrawTrilateratedPosition)
+                foreach (ObjectEstimate Obj in _TrilateratedEstimate)
+                    _DrawObject(Gfx, Obj, Brushes.Blue, 15f);
+            if (_DrawRealPosition)
+                foreach (ObjectEstimate Obj in _RealState)
+                    _DrawObject(Gfx, Obj, Brushes.Green, 15f);
+            if (_DrawMeasurements)
+                foreach (ObjectEstimate Obj in _RawData)
+                    _DrawObject(Gfx, Obj, Brushes.Gray, 8f);
+            if (_DrawEstimatedPosition)
+                foreach (ObjectEstimate Obj in _StateEstimate)
+                    _DrawObject(Gfx, Obj, Brushes.Purple, 15f);
 
             return Bmp;
+        }
+
+        private Image Legend = Image.FromFile("./Legend.png");
+        private void _DrawLegend(Graphics gfx)
+        {
+            gfx.DrawImage(Legend, new Point(0, 0));
         }
 
         private void _DrawBackground(Graphics gfx, Brush color)
@@ -187,6 +235,9 @@ namespace DisplayServer
             foreach (ObjectEstimate est in _RealState)
                 if (est.X - BORDER < LowerXBound)
                     LowerXBound = est.X - BORDER;
+            foreach (ObjectEstimate est in _TrilateratedEstimate)
+                if (est.X - BORDER < LowerXBound)
+                    LowerXBound = est.X - BORDER;
             foreach (Sensor Sen in _Sensors)
                 if (Sen.X - BORDER < LowerXBound)
                     LowerXBound = Sen.X - BORDER;
@@ -204,6 +255,9 @@ namespace DisplayServer
                 if (est.X + BORDER > UpperXBound)
                     UpperXBound = est.X + BORDER;
             foreach (ObjectEstimate est in _RealState)
+                if (est.X + BORDER > UpperXBound)
+                    UpperXBound = est.X + BORDER;
+            foreach (ObjectEstimate est in _TrilateratedEstimate)
                 if (est.X + BORDER > UpperXBound)
                     UpperXBound = est.X + BORDER;
             foreach (Sensor Sen in _Sensors)
@@ -225,6 +279,9 @@ namespace DisplayServer
             foreach (ObjectEstimate est in _RealState)
                 if (est.Y - BORDER < LowerYBound)
                     LowerYBound = est.Y - BORDER;
+            foreach (ObjectEstimate est in _TrilateratedEstimate)
+                if (est.Y - BORDER < LowerYBound)
+                    LowerYBound = est.Y - BORDER;
             foreach (Sensor Sen in _Sensors)
                 if (Sen.Y - BORDER < LowerYBound)
                     LowerYBound = Sen.Y - BORDER;
@@ -242,6 +299,9 @@ namespace DisplayServer
                 if (est.Y + BORDER > UpperYBound)
                     UpperYBound = est.Y + BORDER;
             foreach (ObjectEstimate est in _RealState)
+                if (est.Y + BORDER > UpperYBound)
+                    UpperYBound = est.Y + BORDER;
+            foreach (ObjectEstimate est in _TrilateratedEstimate)
                 if (est.Y + BORDER > UpperYBound)
                     UpperYBound = est.Y + BORDER;
             foreach (Sensor Sen in _Sensors)

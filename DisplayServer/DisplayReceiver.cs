@@ -12,7 +12,7 @@ using System.Windows.Forms;
 
 namespace DisplayServer //TODO: Change console.WriteLine()'s to something in the form
 {
-    public delegate void MessageReceievedDelegate(List<ObjectEstimate> RawData, List<ObjectEstimate> StateEstimate, List<ObjectEstimate> AdditionalStateInfo, List<ObjectEstimate> RealState);
+    public delegate void MessageReceievedDelegate(List<ObjectEstimate> RawData, List<ObjectEstimate> StateEstimate, List<ObjectEstimate> AdditionalStateInfo, List<ObjectEstimate> RealState, List<ObjectEstimate> TrilateratedEstimates);
     class DisplayReceiver
     {
         private IPAddress _ServerIP;
@@ -107,6 +107,12 @@ namespace DisplayServer //TODO: Change console.WriteLine()'s to something in the
                 int RealStateSize = BitConverter.ToInt32(RealStateSizeBuffer, 0);
                 byte[] RealStateBuffer = new byte[RealStateSize];
                 _WaitAndRead(ListenerStream, RealStateBuffer, RealStateSize);
+                //Retrieve the trilaterated estimate data from the network stream
+                byte[] TrilateratedSizeBuffer = new byte[4];
+                _WaitAndRead(ListenerStream, TrilateratedSizeBuffer, TrilateratedSizeBuffer.Length);
+                int TrilateratedSize = BitConverter.ToInt32(TrilateratedSizeBuffer, 0);
+                byte[] TrilateratedBuffer = new byte[TrilateratedSize];
+                _WaitAndRead(ListenerStream, TrilateratedBuffer, TrilateratedSize);
 
 
                 //Check for an end sequence //TODO: FIX!
@@ -142,8 +148,13 @@ namespace DisplayServer //TODO: Change console.WriteLine()'s to something in the
                 RealStateStream.Write(RealStateBuffer, 0, RealStateBuffer.Length);
                 RealStateStream.Position = 0;
                 List<ObjectEstimate> RealStateList = (List<ObjectEstimate>)Formatter.Deserialize(RealStateStream);
+                //Deserialise the trilaterated estimate data into its original List<ObjectEsimate> form
+                MemoryStream TrilateratedEstimateStream = new MemoryStream();
+                TrilateratedEstimateStream.Write(TrilateratedBuffer, 0, TrilateratedBuffer.Length);
+                TrilateratedEstimateStream.Position = 0;
+                List<ObjectEstimate> TrilateratedEstimateList = (List<ObjectEstimate>)Formatter.Deserialize(TrilateratedEstimateStream);
 
-                OnMessageReceived(RawDataList, StateList, AdditionalStateList, RealStateList);
+                OnMessageReceived(RawDataList, StateList, AdditionalStateList, RealStateList, TrilateratedEstimateList);
             }
         }
 

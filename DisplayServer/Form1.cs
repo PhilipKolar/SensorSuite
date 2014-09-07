@@ -22,7 +22,6 @@ namespace DisplayServer
         private StateDrawer Drawer;
         private string FolderPath; // For image and CSV result output
         const string STATE_HISTORY_FILENAME = "StateHistory.csv";
-        private bool DrawAdditionalInfo;
 
         public frmDisplayServer()
         {
@@ -30,7 +29,6 @@ namespace DisplayServer
             try
             {
                 FolderPath = Variables.GetDisplayServerResultFolder(INIFile);
-                DrawAdditionalInfo = Variables.GetDisplayServerDrawAdditional(INIFile);
             }
             catch (Exception ex)
             {
@@ -39,7 +37,7 @@ namespace DisplayServer
             }
         }
 
-        public void MessageReceived(List<ObjectEstimate> rawData, List<ObjectEstimate> stateEstimate, List<ObjectEstimate> additionalStateInfo, List<ObjectEstimate> realState)
+        public void MessageReceived(List<ObjectEstimate> rawData, List<ObjectEstimate> stateEstimate, List<ObjectEstimate> additionalStateInfo, List<ObjectEstimate> realState, List<ObjectEstimate> trilateratedEstimate)
         {
             if (rawData == null)
                 rawData = new List<ObjectEstimate>();
@@ -49,12 +47,14 @@ namespace DisplayServer
                 additionalStateInfo = new List<ObjectEstimate>();
             if (realState == null)
                 realState = new List<ObjectEstimate>();
+            if (trilateratedEstimate == null)
+                trilateratedEstimate = new List<ObjectEstimate>();
 
             DrawingMutex.WaitOne();
             if (Drawer == null)
-                Drawer = new StateDrawer(rawData, stateEstimate, additionalStateInfo, realState, picCurrState.Width, picCurrState.Height, CSVFile, Variables.GetDrawDisplayServerDrawXY1To1(INIFile));
+                Drawer = new StateDrawer(rawData, stateEstimate, additionalStateInfo, realState, trilateratedEstimate, picCurrState.Width, picCurrState.Height, CSVFile, INIFile);
             else
-                Drawer.SetStates(rawData, stateEstimate, additionalStateInfo, realState);
+                Drawer.SetStates(rawData, stateEstimate, additionalStateInfo, realState, trilateratedEstimate);
             Bitmap Bmp = Drawer.DrawState();
 
             Bitmap BmpCopy = (Bitmap)Bmp.Clone(); // Need a copy in order to Save() and display it at the same time, since Bitmap is not a thread safe class

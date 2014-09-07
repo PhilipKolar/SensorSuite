@@ -14,12 +14,14 @@ namespace SensorServer.Estimators
     {
         public List<ObjectEstimate> CurrEsimate { get; private set; }
         public List<ObjectEstimate> CurrAdditionalInfo { get; private set; }
+        public List<ObjectEstimate> TrilateratedEstimates { get; private set; }
         private string _INIFile;
 
         private List<Tuple<Sensor, Measurement>> CurrentStageMeasurements;
         private List<List<Tuple<Sensor, Measurement>>> PreviousStagesMeasurements;
         private KalmanFilter2D _Kalman;
         private MLApp.MLApp _MatlabApp;
+        private bool _UseInitialMeasurementAsState;
 
         public InitialEstimator(string iniFile, MLApp.MLApp matlab_app)
         {
@@ -27,6 +29,7 @@ namespace SensorServer.Estimators
             PreviousStagesMeasurements = new List<List<Tuple<Sensor, Measurement>>>();
             _INIFile = iniFile;
             _MatlabApp = matlab_app;
+            _UseInitialMeasurementAsState = Variables.GetSensorServerUseInitialMeasurementAsState(iniFile);
         }
 
         public void AddMeasurement(Sensor source, Measurement measurement)
@@ -43,8 +46,10 @@ namespace SensorServer.Estimators
             if (TrilateratedData.Count != 0 && _Kalman == null)
             {
                 ObjectEstimate AverageTrilateration = GetAverageEstimate(TrilateratedData);
-                _Kalman = new KalmanFilter2D(_MatlabApp);
-                //_Kalman = new KalmanFilter2D(_MatlabApp, s_pos_x: AverageTrilateration.X, s_pos_y: AverageTrilateration.Y, s_vel_x: 0, s_vel_y: 0);
+                if (_UseInitialMeasurementAsState)
+                    _Kalman = new KalmanFilter2D(_MatlabApp, s_pos_x: AverageTrilateration.X, s_pos_y: AverageTrilateration.Y, s_vel_x: 0, s_vel_y: 0);
+                else 
+                    _Kalman = new KalmanFilter2D(_MatlabApp);
             }
             List<ObjectEstimate> KFilteredData = new List<ObjectEstimate>();
             if (TrilateratedData.Count != 0)
@@ -62,10 +67,11 @@ namespace SensorServer.Estimators
 
             PreviousStagesMeasurements.Add(CurrentStageMeasurements);
             CurrentStageMeasurements = new List<Tuple<Sensor, Measurement>>();
-            
 
-            CurrEsimate = TrilateratedData;
+
+            CurrEsimate = KFilteredData;
             CurrAdditionalInfo = Trileration.CurrAdditionalInfo;
+            TrilateratedEstimates = TrilateratedData;
             return KFilteredData;
         }
 

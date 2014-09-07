@@ -9,6 +9,7 @@ namespace SensorServer.Estimators
     public interface IEstimator
     {
         List<ObjectEstimate> CurrEsimate { get; }
+        List<ObjectEstimate> TrilateratedEstimates { get; }
         List<ObjectEstimate> CurrAdditionalInfo { get; }
         //List<ObjectEstimate> AdditionalInfo;
         void AddMeasurement(Sensor source, Measurement measurement);

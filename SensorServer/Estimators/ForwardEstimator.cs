@@ -14,6 +14,7 @@ namespace SensorServer.Estimators
     {
         public List<ObjectEstimate> CurrEsimate { get; private set; }
         public List<ObjectEstimate> CurrAdditionalInfo { get { throw new NotImplementedException("ForwardEstimator does not provide additional information"); } }
+        public List<ObjectEstimate> TrilateratedEstimates { get { throw new NotImplementedException("ForwardEstimator does not provide additional information"); } }
 
         private List<Tuple<Sensor, Measurement>> CurrentStageMeasurements;
 
