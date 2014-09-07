@@ -19,8 +19,9 @@ namespace SensorServer.Estimators.Tools
         private string _S;
         private string _Z;
         private MLApp.MLApp _Matlab;
+        public bool PredictionNext { get; private set; }
 
-        public KalmanFilter2D(double dt = 1, double measurement_sigma_x = 4, double measurement_sigma_y = 4, string r = "[ measurement_sigma_x ^ 2, 0 ; 0, measurement_sigma_y ^ 2 ]",
+        public KalmanFilter2D(MLApp.MLApp matlab_app, double dt = 1, double measurement_sigma_x = 4, double measurement_sigma_y = 4, string r = "[ measurement_sigma_x ^ 2, 0 ; 0, measurement_sigma_y ^ 2 ]",
             string q = "[ dt ^ 4 / 4, 0, dt^3/2, 0 ; 0, dt^4/4, 0, dt^3/2 ; dt^3/2, 0, dt^2, 0 ; 0, dt^3/2, 0, dt^2 ]",
             string p = "[ dt ^ 4 / 4, 0, dt^3/2, 0 ; 0, dt^4/4, 0, dt^3/2 ; dt^3/2, 0, dt^2, 0 ; 0, dt^3/2, 0, dt^2 ]", double s_pos_x = 0,
             double s_pos_y = 0, double s_vel_x = 0, double s_vel_y = 0)
@@ -36,8 +37,10 @@ namespace SensorServer.Estimators.Tools
             _S = string.Format("[{0} ; {1} ; {2} ; {3}]", s_pos_x, s_pos_y, s_vel_x, s_vel_y);
             _P = p;
 
+            PredictionNext = true;
+
             Type ActivationContext = Type.GetTypeFromProgID("matlab.application.single");
-            _Matlab = (MLApp.MLApp)Activator.CreateInstance(ActivationContext);
+            _Matlab = matlab_app; //(MLApp.MLApp)Activator.CreateInstance(ActivationContext);
             _InitMatlabVariables();
         }
 
@@ -56,24 +59,43 @@ namespace SensorServer.Estimators.Tools
 
         private string _PredictNextStateMean = string.Format("s = A * s;");
         private string _PredictNextCovariance = string.Format("P = A * P * A' + Q;");
-        private string _CalculateKalmanGain = string.Format("K = P * H' / (H * P * H' + R);");
-        private string _UpdateCovarianceEstimation = string.Format("P = (eye(4) - K * H) * P;");
-        public ObjectEstimate CalculateStateEstimate(int next_masurement_x, int next_masurement_y)
+
+        public ObjectEstimate PredictState()
         {
-            //Create measurement matrix in advance
-            _Z = string.Format("[{0} ; {1}]", next_masurement_x, next_masurement_y);
+            if (PredictionNext == false)
+                throw new InvalidOperationException("Predict state cannot be called consecutively, please use CorrectState().");
+            PredictionNext = false;
 
             //Prediction
             _Matlab.Execute(_PredictNextStateMean);
             _Matlab.Execute(_PredictNextCovariance);
+
+            return (GetStateVector("s"));
+        }
+
+        private string _CalculateKalmanGain = string.Format("K = P * H' / (H * P * H' + R);");
+        private string _UpdateCovarianceEstimation = string.Format("P = (eye(4) - K * H) * P;");
+        public ObjectEstimate CorrectState(float next_masurement_x, float next_masurement_y)
+        {
+            if (PredictionNext == true)
+                throw new InvalidOperationException("Correct state cannot be called consecutively, please use PredictState().");
+            PredictionNext = true;
+
+            //Create measurement matrix in advance
+            _Z = string.Format("[{0} ; {1}]", next_masurement_x, next_masurement_y);
             //Correction
             _Matlab.Execute(_CalculateKalmanGain);
             string UpdateStateEstimate = string.Format("s = s + K * ({0} - H * s);", _Z);
             _Matlab.Execute(UpdateStateEstimate);
             _Matlab.Execute(_UpdateCovarianceEstimation);
 
+            return (GetStateVector("s"));
+        }
+
+        public ObjectEstimate GetStateVector(string variable_name)
+        {
             //Grab array from Matlab and parse the string to retrieve values
-            string EstimatedStateMatlabFormatted = _Matlab.Execute("s");
+            string EstimatedStateMatlabFormatted = _Matlab.Execute(variable_name);
             string EstimatedStateSplit1 = EstimatedStateMatlabFormatted.Split('=')[1].Trim();
             string[] EstimatedStateSplit2 = EstimatedStateSplit1.Split(' ');
             string[] EstimatedState = new string[4];

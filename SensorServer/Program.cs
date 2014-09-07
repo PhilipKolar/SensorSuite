@@ -221,8 +221,11 @@ namespace SensorServer
             Sender.WaitForConnection();
             int CurrTimeStage = 0;
 
+
+            Type ActivationContext = Type.GetTypeFromProgID("matlab.application.single");
+            MLApp.MLApp _Matlab = (MLApp.MLApp)Activator.CreateInstance(ActivationContext);
             IEstimator RawMeasurementEstimator = new ForwardEstimator();
-            IEstimator ObjectCandidateEstimator = new InitialEstimator(INIFile);
+            IEstimator ObjectCandidateEstimator = new InitialEstimator(INIFile, _Matlab);
 
             RealStateParser RealParser = null;
             if (Mode == SensorServerMode.ReadFromStore)
@@ -230,8 +233,8 @@ namespace SensorServer
             while (true)
             {
                 WaitForNewMeasurements(DisplayLag_ms, CurrTimeStage);
-                List<Measurement> CurrStageMeasurements = GetTimeStageMeasurements(CurrTimeStage);
 
+                List<Measurement> CurrStageMeasurements = GetTimeStageMeasurements(CurrTimeStage);
                 if (CurrStageMeasurements.Count != 0)
                 {
                     foreach (Measurement CurrMeasurement in CurrStageMeasurements)
