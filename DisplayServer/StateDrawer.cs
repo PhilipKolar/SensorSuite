@@ -32,6 +32,7 @@ namespace DisplayServer
         private bool _DrawTrilateratedPosition;
         private bool _DrawMeasurements;
         private bool _DrawSensors;
+        private bool _DrawLegend;
 
         public StateDrawer(List<ObjectEstimate> rawData, List<ObjectEstimate> stateEstimate, List<ObjectEstimate> additionalStateInfo, List<ObjectEstimate> realState, List<ObjectEstimate> trilatereatedEstimate, int width, int height, string csvFile, string iniFile)
         {
@@ -42,6 +43,7 @@ namespace DisplayServer
             _DrawTrilateratedPosition = Variables.GetDisplayServerDrawTrilaterated(iniFile);
             _DrawMeasurements = Variables.GetDisplayServerDrawMeasurements(iniFile);
             _DrawSensors = Variables.GetDisplayServerDrawSensors(iniFile);
+            _DrawLegend = Variables.GetDisplayServerDrawLegend(iniFile);
 
             Width = width;
             Height = height;
@@ -97,7 +99,8 @@ namespace DisplayServer
 
             _DrawBackground(Gfx, Brushes.WhiteSmoke);
             _DrawAxes(Gfx);
-            _DrawLegend(Gfx);
+            if (_DrawLegend)
+                _DrawTheLegend(Gfx);
             if (_DrawSensors)
                 foreach (Sensor Sen in _Sensors)
                     _DrawSensor(Gfx, Sen);
@@ -121,7 +124,7 @@ namespace DisplayServer
         }
 
         private Image Legend = Image.FromFile("./Legend.png");
-        private void _DrawLegend(Graphics gfx)
+        private void _DrawTheLegend(Graphics gfx)
         {
             gfx.DrawImage(Legend, new Point(0, 0));
         }

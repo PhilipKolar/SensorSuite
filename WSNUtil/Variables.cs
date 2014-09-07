@@ -91,6 +91,11 @@ namespace WSNUtil
             return ConfigFileParser.RetrieveBool("DRAW_SENSORS", iniFile);
         }
 
+        public static bool GetDisplayServerDrawLegend(string iniFile)
+        {
+            return ConfigFileParser.RetrieveBool("DRAW_LEGEND", iniFile);
+        }
+
         /// <summary>
         /// Measured in milliseconds
         /// </summary>
