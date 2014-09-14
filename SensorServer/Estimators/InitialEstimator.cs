@@ -39,13 +39,24 @@ namespace SensorServer.Estimators
 
         public List<ObjectEstimate> ComputeEstimate()
         {
-            TrilateratorNoiseless0D Trileration = new TrilateratorNoiseless0D(Variables.GetSensorServerTrilateratorNoiseless0DDistanceTolerance(_INIFile),
-                                                                              Variables.GetSensorServerTrilateratorNoiseless0DAveragingAnchor(_INIFile) );
+
+            Trilaterator Trileration = null;
+            string Mode = Variables.GetSensorServerInitialEstimatorTrilaterator(_INIFile);
+            if (Mode == "TRILATERATOR_NOISELESS_0D")
+            {
+                Trileration = new TrilateratorNoiseless0D(Variables.GetSensorServerTrilateratorNoiseless0DDistanceTolerance(_INIFile),
+                                                                                   Variables.GetSensorServerTrilateratorNoiseless0DAveragingAnchor(_INIFile));
+            }
+            else if (Mode == "TRILATERATOR_NOISY_2D")
+            {
+                Trileration = new TrilateratorNoisy2D(Variables.GetSensorServerTrilateratorGroupingThreshhold(_INIFile),
+                                                      Variables.GetSensorServerTrilateratorGridDivison(_INIFile));
+            }
             List<ObjectEstimate> TrilateratedData = Trileration.CalculateEstimates(CurrentStageMeasurements);
             
             if (TrilateratedData.Count != 0 && _Kalman == null)
             {
-                ObjectEstimate AverageTrilateration = GetAverageEstimate(TrilateratedData);
+                ObjectEstimate AverageTrilateration = GetAverageEstimate(TrilateratedData); // TODO: Add mode
                 if (_UseInitialMeasurementAsState)
                     _Kalman = new KalmanFilter2D(_MatlabApp, s_pos_x: AverageTrilateration.X, s_pos_y: AverageTrilateration.Y, s_vel_x: 0, s_vel_y: 0);
                 else 

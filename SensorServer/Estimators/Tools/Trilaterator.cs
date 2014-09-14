@@ -9,6 +9,7 @@ namespace SensorServer.Estimators.Tools
     public abstract class Trilaterator
     {
         public abstract List<ObjectEstimate> CalculateEstimates(List<Tuple<Sensor, Measurement>> Measurements);
+        public abstract List<ObjectEstimate> CurrAdditionalInfo { get; protected set; }
 
         protected virtual bool _IsWithinVision(ObjectEstimate candidate, Sensor[] sensorList)
         {

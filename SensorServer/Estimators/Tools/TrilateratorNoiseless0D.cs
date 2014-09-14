@@ -9,7 +9,7 @@ namespace SensorServer.Estimators.Tools
     class TrilateratorNoiseless0D : Trilaterator
     {
         public double DistanceTolerance { get; private set; }
-        public List<ObjectEstimate> CurrAdditionalInfo { get; private set; }
+        public override List<ObjectEstimate> CurrAdditionalInfo { get; protected set; }
         public bool AveragingAnchor { get; private set; }
         public TrilateratorNoiseless0D(double distanceTolerance, bool averagingAnchor)
         {

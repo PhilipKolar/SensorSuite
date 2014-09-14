@@ -48,6 +48,7 @@
     <Compile Include="Estimators\Tools\KalmanFilter2D.cs" />
     <Compile Include="Estimators\Tools\Trilaterator.cs" />
     <Compile Include="Estimators\Tools\TrilateratorNoiseless0D.cs" />
+    <Compile Include="Estimators\Tools\TrilateratorNoisy2D.cs" />
     <Compile Include="MeasurementStore.cs" />
     <Compile Include="RealStateParser.cs" />
     <Compile Include="SensorReceiver.cs" />

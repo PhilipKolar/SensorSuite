@@ -32,6 +32,26 @@ namespace WSNUtil
             }
         }
 
+        public static float GetSensorServerTrilateratorGroupingThreshhold(string iniFile)
+        {
+            return ConfigFileParser.RetrieveFloat("TRILATERATOR_NOISY_2D_GROUPING_THRESHOLD", iniFile);
+        }
+
+        public static int GetSensorServerTrilateratorGridDivison(string iniFile)
+        {
+            return ConfigFileParser.RetrieveInt("TRILATERATOR_NOISY_2D_GRID_DIVISON", iniFile);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="iniFile"></param>
+        /// <returns>A string of the trilaterator's class name in ALL CAPS</returns>
+        public static string GetSensorServerInitialEstimatorTrilaterator(string iniFile)
+        {
+            return ConfigFileParser.RetrieveString("INITIAL_ESTIMATOR_TRILATERATOR", iniFile).ToUpper();
+        }
+
         public static bool GetSensorServerUseInitialMeasurementAsState(string iniFile)
         {
             return ConfigFileParser.RetrieveBool("USE_INITIAL_MEASUREMENT_AS_STATE", iniFile);
