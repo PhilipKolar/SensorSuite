@@ -21,6 +21,7 @@ namespace DisplayServer
         private int MessageCount = 0;
         private StateDrawer Drawer;
         private string FolderPath; // For image and CSV result output
+        private static ErrorCalculator ErrorCalc;
         const string STATE_HISTORY_FILENAME = "StateHistory.csv";
 
         public frmDisplayServer()
@@ -60,11 +61,11 @@ namespace DisplayServer
             Bitmap BmpCopy = (Bitmap)Bmp.Clone(); // Need a copy in order to Save() and display it at the same time, since Bitmap is not a thread safe class
             picCurrState.Image = BmpCopy;
             picCurrState.Invalidate();
-
-            //Bmp.Save(string.Format("testImage-{0}.png", CurrImageID++));
             SaveMessage(Bmp, CurrImageID++, rawData, stateEstimate);
-
             lblMessageCount.Invoke((MethodInvoker)(() => lblMessageCount.Text = (++MessageCount).ToString()));
+
+            ErrorCalc.AddNewMeasure(MessageCount, stateEstimate.ToArray(), realState.ToArray());
+            ErrorCalc.SaveToFile(string.Format("{0}/ErrorResults.txt", FolderPath));
             DrawingMutex.ReleaseMutex();
         }
 
@@ -111,6 +112,7 @@ namespace DisplayServer
 
         private void Init_Form()
         {
+            ErrorCalc = new ErrorCalculator();
             DisplayReceiver Receiver = new DisplayReceiver(INIFile, lblDebugInfo);
             Receiver.OnMessageReceived += MessageReceived;
             FolderPath = GetFolderPath(FolderPath); //Update the FolderPath value to not overwrite previous runs
