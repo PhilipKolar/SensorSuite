@@ -64,7 +64,7 @@ namespace DisplayServer
             SaveMessage(Bmp, CurrImageID++, rawData, stateEstimate);
             lblMessageCount.Invoke((MethodInvoker)(() => lblMessageCount.Text = (++MessageCount).ToString()));
 
-            ErrorCalc.AddNewMeasure(MessageCount, stateEstimate.ToArray(), realState.ToArray());
+            ErrorCalc.AddNewMeasure(MessageCount, trilateratedEstimate.ToArray(), stateEstimate.ToArray(), realState.ToArray());
             ErrorCalc.SaveToFile(string.Format("{0}/ErrorResults.txt", FolderPath));
             DrawingMutex.ReleaseMutex();
         }
