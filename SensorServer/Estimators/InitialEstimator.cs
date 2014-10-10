@@ -43,15 +43,15 @@ namespace SensorServer.Estimators
             Trilaterator Trileration = null;
             string Mode = Variables.GetSensorServerInitialEstimatorTrilaterator(_INIFile);
             if (Mode == "TRILATERATOR_NOISELESS_0D")
-            {
                 Trileration = new TrilateratorNoiseless0D(Variables.GetSensorServerTrilateratorNoiseless0DDistanceTolerance(_INIFile),
                                                                                    Variables.GetSensorServerTrilateratorNoiseless0DAveragingAnchor(_INIFile));
-            }
             else if (Mode == "TRILATERATOR_NOISY_2D")
-            {
                 Trileration = new TrilateratorNoisy2D(Variables.GetSensorServerTrilateratorGroupingThreshhold(_INIFile),
                                                       Variables.GetSensorServerTrilateratorGridDivison(_INIFile));
-            }
+            else if (Mode == "TRILATERATOR_NOISY_2D_LEAST_SQUARES")
+                Trileration = new TrilateratorNoisy2DLeastSquares(Variables.GetSensorServerOctaveBinaryPath(_INIFile), false,
+                                                                  Variables.GetSensorServerTrilateratorScriptPathLeastSquares(_INIFile), 8,
+                                                                  Variables.GetSensorServerTrilateratorGroupingThresholdLeastSquares(_INIFile));
             List<ObjectEstimate> TrilateratedData = Trileration.CalculateEstimates(CurrentStageMeasurements);
             
             if (TrilateratedData.Count != 0 && _Kalman == null)

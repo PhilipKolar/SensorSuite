@@ -41,6 +41,39 @@ namespace SensorServer.Estimators.Tools
             return true;
         }
 
+        protected virtual bool _IsWithinVision(double[] candidate, Sensor[] sensorList)
+        {
+            if (candidate.Length != 2)
+                throw new ArgumentOutOfRangeException("candidate must be of length 2, [x, y]");
+
+            foreach (Sensor s in sensorList)
+            {
+                if (candidate[0] == s.X && candidate[1] == s.Y)
+                    continue;
+
+                double candidatePhi = Math.Abs(_ToDeg(Math.Atan((s.Y - candidate[1]) / (s.X - candidate[0]))));
+                if (candidate[0] <= s.X && candidate[1] >= s.Y)
+                {
+                    candidatePhi = 180 - candidatePhi;
+                }
+                else if (candidate[0] <= s.X && candidate[1] < s.Y)
+                {
+                    candidatePhi = 180 + candidatePhi;
+                }
+                else if (candidate[0] >= s.X && candidate[1] < s.Y)
+                {
+                    candidatePhi = 360 - candidatePhi;
+                }
+
+                if (candidatePhi > s.Phi + s.Theta / 2 ||
+                    candidatePhi < s.Phi - s.Theta / 2)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         protected virtual double _ToDeg(double angle)
         {
             return angle * (180.0 / Math.PI);

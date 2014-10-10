@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="LibSharpTave">
+      <HintPath>..\LibSharpTave\bin\Debug\LibSharpTave.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -49,6 +52,7 @@
     <Compile Include="Estimators\Tools\Trilaterator.cs" />
     <Compile Include="Estimators\Tools\TrilateratorNoiseless0D.cs" />
     <Compile Include="Estimators\Tools\TrilateratorNoisy2D.cs" />
+    <Compile Include="Estimators\Tools\TrilateratorNoisy2DLeastSquares.cs" />
     <Compile Include="MeasurementStore.cs" />
     <Compile Include="RealStateParser.cs" />
     <Compile Include="SensorReceiver.cs" />

@@ -32,6 +32,21 @@ namespace WSNUtil
             }
         }
 
+        public static float GetSensorServerTrilateratorGroupingThresholdLeastSquares(string iniFile)
+        {
+            return ConfigFileParser.RetrieveFloat("TRILATERATOR_NOISY_2D_LEAST_SQUARES_GROUPING_THRESHOLD", iniFile);
+        }
+
+        public static string GetSensorServerOctaveBinaryPath(string iniFile)
+        {
+            return ConfigFileParser.RetrieveString("SENSOR_SERVER_OCTAVE_BINARY_PATH", iniFile);
+        }
+
+        public static string GetSensorServerTrilateratorScriptPathLeastSquares(string iniFile)
+        {
+            return ConfigFileParser.RetrieveString("TRILATERATOR_NOISY_2D_LEAST_SQUARES_OCTAVE_SCRIPT_PATH", iniFile);
+        }
+
         public static float GetSensorServerTrilateratorGroupingThreshhold(string iniFile)
         {
             return ConfigFileParser.RetrieveFloat("TRILATERATOR_NOISY_2D_GROUPING_THRESHOLD", iniFile);

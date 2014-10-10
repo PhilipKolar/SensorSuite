@@ -32,5 +32,5 @@ namespace WSNUtil
             VelocityX = toCopy.VelocityX;
             VelocityY = toCopy.VelocityY;
         }
-    }
-}
+    } // End class
+} // End namespace
