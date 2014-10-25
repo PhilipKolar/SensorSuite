@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using WSNUtil;
 using SensorServer.Estimators.Tools;
+using LibSharpTave;
 
 namespace SensorServer.Estimators
 {
@@ -19,22 +20,33 @@ namespace SensorServer.Estimators
 
         private List<Tuple<Sensor, Measurement>> CurrentStageMeasurements;
         private List<List<Tuple<Sensor, Measurement>>> PreviousStagesMeasurements;
-        private KalmanFilter2D _Kalman;
-        private MLApp.MLApp _MatlabApp;
+        private KalmanFilter2DOctave _Kalman;
+        //private MLApp.MLApp _MatlabApp; //TODO: Delete if Octave kalman filter works
+        private Octave _Oct;
         private bool _UseInitialMeasurementAsState;
 
-        public InitialEstimator(string iniFile, MLApp.MLApp matlab_app)
+        //public InitialEstimator(string iniFile, MLApp.MLApp matlab_app) //TODO: Delete if Octave kalman filter works
+        //{
+        //    CurrentStageMeasurements = new List<Tuple<Sensor, Measurement>>();
+        //    PreviousStagesMeasurements = new List<List<Tuple<Sensor, Measurement>>>();
+        //    _INIFile = iniFile;
+        //    _MatlabApp = matlab_app;
+        //    _UseInitialMeasurementAsState = Variables.GetSensorServerUseInitialMeasurementAsState(iniFile);
+        //}
+
+        public InitialEstimator(string iniFile, Octave oct)
         {
             CurrentStageMeasurements = new List<Tuple<Sensor, Measurement>>();
             PreviousStagesMeasurements = new List<List<Tuple<Sensor, Measurement>>>();
             _INIFile = iniFile;
-            _MatlabApp = matlab_app;
+            _Oct = oct;
             _UseInitialMeasurementAsState = Variables.GetSensorServerUseInitialMeasurementAsState(iniFile);
         }
 
         public void AddMeasurement(Sensor source, Measurement measurement)
         {
-            CurrentStageMeasurements.Add(new Tuple<Sensor, Measurement>(source, measurement));
+            if (measurement.Distance > 0)
+                CurrentStageMeasurements.Add(new Tuple<Sensor, Measurement>(source, measurement));
         }
 
         public List<ObjectEstimate> ComputeEstimate()
@@ -50,7 +62,8 @@ namespace SensorServer.Estimators
                                                       Variables.GetSensorServerTrilateratorGridDivison(_INIFile));
             else if (Mode == "TRILATERATOR_NOISY_2D_LEAST_SQUARES")
                 Trileration = new TrilateratorNoisy2DLeastSquares(Variables.GetSensorServerOctaveBinaryPath(_INIFile), false,
-                                                                  Variables.GetSensorServerTrilateratorScriptPathLeastSquares(_INIFile), 8,
+                                                                  Variables.GetSensorServerTrilateratorScriptPathLeastSquares(_INIFile),
+                                                                  (uint) Variables.GetSensorServerTrilateratorLeastSquaresIterations(_INIFile),
                                                                   Variables.GetSensorServerTrilateratorGroupingThresholdLeastSquares(_INIFile));
             List<ObjectEstimate> TrilateratedData = Trileration.CalculateEstimates(CurrentStageMeasurements);
             
@@ -58,9 +71,9 @@ namespace SensorServer.Estimators
             {
                 ObjectEstimate AverageTrilateration = GetAverageEstimate(TrilateratedData); // TODO: Add mode
                 if (_UseInitialMeasurementAsState)
-                    _Kalman = new KalmanFilter2D(_MatlabApp, s_pos_x: AverageTrilateration.X, s_pos_y: AverageTrilateration.Y, s_vel_x: 0, s_vel_y: 0);
-                else 
-                    _Kalman = new KalmanFilter2D(_MatlabApp);
+                    _Kalman = new KalmanFilter2DOctave(_Oct, s_pos_x: AverageTrilateration.X, s_pos_y: AverageTrilateration.Y, s_vel_x: 0, s_vel_y: 0);
+                else
+                    _Kalman = new KalmanFilter2DOctave(_Oct);
             }
             List<ObjectEstimate> KFilteredData = new List<ObjectEstimate>();
             if (TrilateratedData.Count != 0)

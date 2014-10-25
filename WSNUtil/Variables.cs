@@ -31,6 +31,10 @@ namespace WSNUtil
                 return _DefaultCSVLocation;
             }
         }
+        public static int GetSensorServerTrilateratorLeastSquaresIterations(string iniFile)
+        {
+            return ConfigFileParser.RetrieveInt("TRILATERATOR_NOISY_2D_LEAST_SQUARES_ITERATIONS", iniFile);
+        }
 
         public static float GetSensorServerTrilateratorGroupingThresholdLeastSquares(string iniFile)
         {

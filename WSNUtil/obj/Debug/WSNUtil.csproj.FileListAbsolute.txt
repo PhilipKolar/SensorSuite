@@ -18,3 +18,8 @@ C:\Users\phili_000\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\WSNUti
 C:\Users\phili_000\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\WSNUtil\obj\Debug\WSNUtil.csprojResolveAssemblyReference.cache
 C:\Users\phili_000\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\WSNUtil\obj\Debug\WSNUtil.dll
 C:\Users\phili_000\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\WSNUtil\obj\Debug\WSNUtil.pdb
+C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\WSNUtil\bin\Debug\WSNUtil.dll
+C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\WSNUtil\bin\Debug\WSNUtil.pdb
+C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\WSNUtil\obj\Debug\WSNUtil.csprojResolveAssemblyReference.cache
+C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\WSNUtil\obj\Debug\WSNUtil.dll
+C:\Users\Philip\Desktop\Dropbox\Uni Stuff\Honours\Programs\SensorSuite\WSNUtil\obj\Debug\WSNUtil.pdb

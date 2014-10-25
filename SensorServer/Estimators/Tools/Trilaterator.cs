@@ -13,6 +13,13 @@ namespace SensorServer.Estimators.Tools
 
         protected virtual bool _IsWithinVision(ObjectEstimate candidate, Sensor[] sensorList)
         {
+            double[] arg1 = new double[] {candidate.X, candidate.Y};
+            return _IsWithinVision(arg1, sensorList);
+        }
+
+        protected virtual int _VisibleSensorCount(ObjectEstimate candidate, Sensor[] sensorList)
+        {
+            int SensorCount = 0;
             foreach (Sensor s in sensorList)
             {
                 if (candidate.X == s.X && candidate.Y == s.Y)
@@ -32,13 +39,37 @@ namespace SensorServer.Estimators.Tools
                     candidatePhi = 360 - candidatePhi;
                 }
 
-                if (candidatePhi > s.Phi + s.Theta / 2 ||
-                    candidatePhi < s.Phi - s.Theta / 2)
+                float SensorAngle1 = ((s.Phi + s.Theta / 2) + 360) % 360;
+                float SensorAngle2 = ((s.Phi - s.Theta / 2) + 360) % 360;
+                if (candidatePhi >= 0 && candidatePhi <= 90)
                 {
-                    return false;
+                    candidatePhi += 90;
+                    SensorAngle1 += 90;
+                    SensorAngle2 += 90;
+                    SensorAngle1 %= 360;
+                    SensorAngle2 %= 360;
                 }
+                else if (candidatePhi >= 270 && candidatePhi <= 360)
+                {
+                    candidatePhi -= 90;
+                    SensorAngle1 -= 90;
+                    SensorAngle2 -= 90;
+                    SensorAngle1 = (SensorAngle1 + 360) % 360;
+                    SensorAngle2 = (SensorAngle2 + 360) % 360;
+                }
+                bool Pass = false;
+                if (candidatePhi <= SensorAngle1 && candidatePhi >= SensorAngle2)
+                    Pass = true;
+                //else if (candidatePhi <= SensorAngle1 + 360 && candidatePhi >= SensorAngle2)
+                //    Pass = true;
+                //else if (candidatePhi <= SensorAngle1 && candidatePhi >= SensorAngle2 + 360)
+                //    Pass = true;
+                //else if (candidatePhi <= SensorAngle1 + 360 && candidatePhi >= SensorAngle2 + 360)
+                //    Pass = true;
+                if (Pass)
+                    SensorCount++;
             }
-            return true;
+            return SensorCount;
         }
 
         protected virtual bool _IsWithinVision(double[] candidate, Sensor[] sensorList)
@@ -65,11 +96,29 @@ namespace SensorServer.Estimators.Tools
                     candidatePhi = 360 - candidatePhi;
                 }
 
-                if (candidatePhi > s.Phi + s.Theta / 2 ||
-                    candidatePhi < s.Phi - s.Theta / 2)
+                float SensorAngle1 = ((s.Phi - s.Theta / 2) + 360) % 360;
+                float SensorAngle2 = ((s.Phi + s.Theta / 2) + 360) % 360;
+                if (candidatePhi >= 0 && candidatePhi <= 90)
                 {
-                    return false;
+                    candidatePhi += 90;
+                    SensorAngle1 += 90;
+                    SensorAngle2 += 90;
+                    SensorAngle1 %= 360;
+                    SensorAngle2 %= 360;
                 }
+                else if (candidatePhi >= 270 && candidatePhi <= 360)
+                {
+                    candidatePhi -= 90;
+                    SensorAngle1 -= 90;
+                    SensorAngle2 -= 90;
+                    SensorAngle1 = (SensorAngle1 + 360) % 360;
+                    SensorAngle2 = (SensorAngle2 + 360) % 360;
+                }
+                bool Pass = false;
+                if (candidatePhi <= SensorAngle1 || candidatePhi >= SensorAngle2)
+                    Pass = true;
+                if (Pass == true)
+                    return false;
             }
             return true;
         }

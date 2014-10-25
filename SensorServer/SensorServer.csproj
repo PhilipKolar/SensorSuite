@@ -48,6 +48,7 @@
     <Compile Include="Estimators\ForwardEstimator.cs" />
     <Compile Include="Estimators\IEstimator.cs" />
     <Compile Include="Estimators\InitialEstimator.cs" />
+    <Compile Include="Estimators\Tools\KalmanFilter2DOctave.cs" />
     <Compile Include="Estimators\Tools\KalmanFilter2D.cs" />
     <Compile Include="Estimators\Tools\Trilaterator.cs" />
     <Compile Include="Estimators\Tools\TrilateratorNoiseless0D.cs" />

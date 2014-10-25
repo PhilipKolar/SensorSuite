@@ -68,10 +68,14 @@ namespace SensorServer.Estimators.Tools
             EndY += LargestMaxDistance;
 
 
+            Sensor[] SensorList = new Sensor[group.Count];
+            for (int i = 0; i < group.Count; i++)
+                SensorList[i] = group[i].Item1;
             float CurrX = StartX;
             float CurrY = StartY;
             float IncremeentX = (EndX - StartX) / GridDivision;
             float IncremeentY = (EndY - StartY) / GridDivision;
+            List<Tuple<ObjectEstimate, float>> BestCandidates = new List<Tuple<ObjectEstimate,float>>(); //Estimate, error
             ObjectEstimate BestCandidate = null;
             float BestCandidateError = float.MaxValue;
             for (int i = 0; i < GridDivision; i++)
@@ -79,12 +83,20 @@ namespace SensorServer.Estimators.Tools
                 for (int j = 0; j < GridDivision; j++)
                 {
                     ObjectEstimate CurrPos = new ObjectEstimate(CurrX, CurrY, 0, 0);
-                    if (_GroupHasVision(group, CurrPos) == false)
+                    int SensorsVisible = _VisibleSensorCount(CurrPos, SensorList);
+                    if (SensorsVisible != SensorList.Length) //All visible sensor check
                     {
                         CurrX += IncremeentX;
                         continue;
                     }
+                    //if (_GroupHasVision(group, CurrPos) == false)
+                    //{
+                    //    CurrX += IncremeentX;
+                    //    continue;
+                    //}
                     float SquareError = _GetSquaredError(group, CurrPos);
+                    InsertWithTolerance(BestCandidates, BestCandidateError, CurrPos, SquareError, 0.05f);
+
                     if (SquareError < BestCandidateError)
                     {
                         BestCandidate = CurrPos;
@@ -96,7 +108,55 @@ namespace SensorServer.Estimators.Tools
                 CurrX = StartX;
             }
 
-            return BestCandidate;
+            //Now out of all the candidates look for the candidate that is seen by the most sensors, and then the one with the best error
+            BestCandidate = null;
+            Tuple<ObjectEstimate, float> FinalBestCandidate = null;
+            float CurrSensorsVisible = -1;
+            float CurrError = float.MaxValue;
+            for (int i = 0; i < BestCandidates.Count; i++)
+            {
+                int SensorsVisible = _VisibleSensorCount(BestCandidates[i].Item1, SensorList);
+                if (SensorsVisible == 0) //No 0 vision check
+                    continue;
+                else if (SensorsVisible > CurrSensorsVisible)
+                {
+                    FinalBestCandidate = BestCandidates[i];
+                    CurrSensorsVisible = SensorsVisible;
+                    CurrError = BestCandidates[i].Item2;
+                }
+                else if (SensorsVisible == CurrSensorsVisible)
+                {
+                    if (BestCandidates[i].Item2 < CurrError)
+                    {
+                        FinalBestCandidate = BestCandidates[i];
+                        CurrError = BestCandidates[i].Item2;
+                    }
+                }
+            }
+
+            if (FinalBestCandidate == null)
+                return null;
+            else
+                return FinalBestCandidate.Item1;
+        }
+
+        private void InsertWithTolerance(List<Tuple<ObjectEstimate, float>> bestCandidates, float lowestError, ObjectEstimate newCandidate, float newError, float tolerance)
+        {
+            if (bestCandidates.Count == 0)
+            {
+                bestCandidates.Add(new Tuple<ObjectEstimate, float>(newCandidate, newError));
+                return;
+            }
+
+            if (newError < lowestError)
+                lowestError = newError;
+            for (int i = 0; i < bestCandidates.Count; i++)
+            {
+                if (bestCandidates[i].Item2 > lowestError * (1 + tolerance))
+                    bestCandidates.RemoveAt(i--);
+            }
+            if (newError <= lowestError * (1 + tolerance))
+                bestCandidates.Add(new Tuple<ObjectEstimate, float>(newCandidate, newError));
         }
 
         private bool _GroupHasVision(List<Tuple<Sensor, Measurement>> group, ObjectEstimate candidate) //TODO: Delete?

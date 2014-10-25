@@ -109,7 +109,7 @@ namespace DisplayServer
                     _DrawObject(Gfx, Obj, Brushes.Yellow, 15f);
             if (_DrawTrilateratedPosition)
                 foreach (ObjectEstimate Obj in _TrilateratedEstimate)
-                    _DrawObject(Gfx, Obj, Brushes.Blue, 15f);
+                    _DrawObject(Gfx, Obj, Brushes.Blue, 18f);
             if (_DrawRealPosition)
                 foreach (ObjectEstimate Obj in _RealState)
                     _DrawObject(Gfx, Obj, Brushes.Green, 15f);

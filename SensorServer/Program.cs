@@ -6,6 +6,7 @@ using WSNUtil;
 using SensorServer.Estimators;
 using System.Threading;
 using System.IO;
+using LibSharpTave;
 
 namespace SensorServer
 {
@@ -222,10 +223,12 @@ namespace SensorServer
             int CurrTimeStage = 0;
 
 
-            Type ActivationContext = Type.GetTypeFromProgID("matlab.application.single");
-            MLApp.MLApp _Matlab = (MLApp.MLApp)Activator.CreateInstance(ActivationContext);
+            //Type ActivationContext = Type.GetTypeFromProgID("matlab.application.single"); //TODO: Delete if Octave kalman filter works
+            //MLApp.MLApp _Matlab = (MLApp.MLApp)Activator.CreateInstance(ActivationContext); //TODO: Delete if Octave kalman filter works
+            Octave Oct = new Octave(Variables.GetSensorServerOctaveBinaryPath(INIFile), false);
             IEstimator RawMeasurementEstimator = new ForwardEstimator();
-            IEstimator ObjectCandidateEstimator = new InitialEstimator(INIFile, _Matlab);
+            IEstimator ObjectCandidateEstimator = new InitialEstimator(INIFile, Oct); //_Matlab);
+
 
             RealStateParser RealParser = null;
             if (Mode == SensorServerMode.ReadFromStore)
