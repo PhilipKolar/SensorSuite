@@ -95,14 +95,14 @@ namespace SensorServer
                 string NatureOfMotion = CommaSplit[0].Trim().ToUpper();
                 if (NatureOfMotion != "LINEAR" && NatureOfMotion != "CURVED")
                     continue;
-                int StartX, StartY, EndX, EndY;
-                if (int.TryParse(CommaSplit[1].Trim(), out StartX) == false)
+                float StartX, StartY, EndX, EndY;
+                if (float.TryParse(CommaSplit[1].Trim(), out StartX) == false)
                     continue;
-                if (int.TryParse(CommaSplit[2].Trim(), out StartY) == false)
+                if (float.TryParse(CommaSplit[2].Trim(), out StartY) == false)
                     continue;
-                if (int.TryParse(CommaSplit[3].Trim(), out EndX) == false)
+                if (float.TryParse(CommaSplit[3].Trim(), out EndX) == false)
                     continue;
-                if (int.TryParse(CommaSplit[4].Trim(), out EndY) == false)
+                if (float.TryParse(CommaSplit[4].Trim(), out EndY) == false)
                     continue;
                 float Duration;
                 if (float.TryParse(CommaSplit[5].Split(CommentIndicators)[0].Trim(), out Duration) == false)
