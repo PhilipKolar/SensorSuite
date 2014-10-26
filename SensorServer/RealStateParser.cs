@@ -55,11 +55,30 @@ namespace SensorServer
                 }
                 else if (m.NatureOfMotion == "CURVED")
                 {
-                    throw new NotImplementedException("CURVED motions are not yet implemented, use LINEAR motions in the meanwhile");
+                    float TimeExpired = (float)(time - m.StartTime).TotalSeconds;
+                    float TimeExpiredPercent = TimeExpired / (float)m.Duration.TotalSeconds;
+                    float AngleFromNegXAxis = 90f * TimeExpiredPercent;
+                    float Radius = Math.Abs(m.StartX - m.EndX);
+                    float IncrementX = Radius * (float)Math.Cos(_ToRad(AngleFromNegXAxis));
+                    float PosX = m.EndX - IncrementX;
+                    float IncrementY = Radius * (float)Math.Sin(_ToRad(AngleFromNegXAxis));
+                    float PosY = m.StartY - IncrementY;
+                    ObjectEstimate RealState = new ObjectEstimate(PosX, PosY, 0f, 0f); //TODO: Calculate the velocities, use the tangents of the circle
+                    return RealState;
                 }
             }
 
             return null;
+        }
+
+        private double _ToDeg(double radians)
+        {
+            return radians * 180f / Math.PI;
+        }
+
+        private double _ToRad(double degrees)
+        {
+            return degrees * Math.PI / 180f;
         }
 
         private DateTime _GetStartTime(StreamReader file)

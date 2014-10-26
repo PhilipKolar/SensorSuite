@@ -138,6 +138,7 @@ namespace SensorServer
             catch (Exception ex)
             {
                 Console.WriteLine("Error retrieving mode of operation for sensor server in INI file at {0}. Exception message: '{1}'.\nShutting sensor server down.", INIFile, ex.Message);
+                Console.ReadKey();
                 return;
             }
 
