@@ -29,6 +29,16 @@ namespace DisplayServer
         private float _SquaredMeanErrorOnlyTri;
         private int _NoEstimateCountOnlyTri;
 
+        private Dictionary<int, float> _TriError;
+        private float _TriMinError;
+        private float _TriMaxError;
+        private float _TriMeanError;
+        private Dictionary<int, float> _TriSquaredError;
+        private float _TriSquaredMinError;
+        private float _TriSquaredMaxError;
+        private float _TriSquaredMeanError;
+        private int _TriNoEstimateCount;
+
         public ErrorCalculator()
         {
             _Error = new Dictionary<int, float>();
@@ -46,6 +56,14 @@ namespace DisplayServer
             _SquaredMinErrorOnlyTri = float.MaxValue;
             _SquaredMaxErrorOnlyTri = float.MinValue;
             _NoEstimateCountOnlyTri = 0;
+
+            _TriError = new Dictionary<int, float>();
+            _TriSquaredError = new Dictionary<int, float>();
+            _TriMinError = float.MaxValue;
+            _TriMaxError = float.MinValue;
+            _TriSquaredMinError = float.MaxValue;
+            _TriSquaredMaxError = float.MinValue;
+            _TriNoEstimateCount = 0;
         }
 
         public void AddNewMeasure(int MessageCount, ObjectEstimate trilateration, ObjectEstimate estimateState, ObjectEstimate trueState)
@@ -106,6 +124,31 @@ namespace DisplayServer
                 _SquaredErrorOnlyTri.Add(MessageCount, CurrSquaredErrorOnlyTri);
             }
 
+            //Trilateration error
+            if (trilateration != null)
+            {
+                float CurrTriError = (float)Math.Sqrt((Math.Pow(trilateration.X - trueState.X, 2) + Math.Pow(trilateration.Y - trueState.Y, 2)));
+                _TriMinError = Math.Min(_TriMinError, CurrTriError);
+                _TriMaxError = Math.Max(_TriMaxError, CurrTriError);
+                float CurrTriMeanError = CurrTriError;
+                foreach (KeyValuePair<int, float> kvp in _TriError) //TODO: Change the mean calculation to run in O(1) time instead of O(n)
+                    CurrTriMeanError += kvp.Value;
+                _TriMeanError = CurrTriMeanError / (_TriError.Count + 1);
+                _TriError.Add(MessageCount, CurrTriError);
+            }
+
+            //Trilateration error - RMSE
+            if (trilateration != null)
+            {
+                float CurrTriSquareError = (float)(Math.Pow(trilateration.X - trueState.X, 2) + Math.Pow(trilateration.Y - trueState.Y, 2));
+                _TriSquaredMinError = Math.Min(_TriSquaredMinError, CurrTriSquareError);
+                _TriSquaredMaxError = Math.Max(_TriSquaredMaxError, CurrTriSquareError);
+                float CurrTriMeanSquaredError = CurrTriSquareError;
+                foreach (KeyValuePair<int, float> kvp in _TriSquaredError) //TODO: Change the mean calculation to run in O(1) time instead of O(n)
+                    CurrTriMeanSquaredError += kvp.Value;
+                _TriSquaredMeanError = CurrTriMeanSquaredError / (_TriSquaredError.Count + 1);
+                _TriSquaredError.Add(MessageCount, CurrTriSquareError);
+            }
         }
 
         public void AddNewMeasure(int MessageCount, ObjectEstimate[] trilateration, ObjectEstimate[] estimateState, ObjectEstimate[] trueState) //This method averages each array and calls the single objectestimate AddNewMeasurement() instead
@@ -193,6 +236,19 @@ namespace DisplayServer
             Writer.WriteLine("Mean: {0}cm{1}Min:  {2}cm{1}Max:  {3}cm", _MeanErrorOnlyTri, Environment.NewLine, _MinErrorOnlyTri, _MaxErrorOnlyTri);
             Writer.WriteLine("*** RMSE ***");
             Writer.WriteLine("Mean: {0}cm{1}Min:  {2}cm{1}Max:  {3}cm", Math.Sqrt(_SquaredMeanErrorOnlyTri), Environment.NewLine, Math.Sqrt(_SquaredMinErrorOnlyTri), Math.Sqrt(_SquaredMaxErrorOnlyTri));
+            Writer.WriteLine();
+            Writer.WriteLine("======================================");
+            Writer.WriteLine();
+            Writer.WriteLine("Error for TRIALTERATION:");
+            Writer.WriteLine();
+            Writer.WriteLine("Sample count: {0}", _TriError.Count);
+            Writer.WriteLine("No estimate count: {0}", _TriNoEstimateCount);
+            Writer.WriteLine("Real state count:  {0} (i.e. Sample count + No estimate count)", _TriError.Count + _TriNoEstimateCount);
+            Writer.WriteLine();
+            Writer.WriteLine("*** UNMODIFIED ERROR ***");
+            Writer.WriteLine("Mean: {0}cm{1}Min:  {2}cm{1}Max:  {3}cm", _TriMeanError, Environment.NewLine, _TriMinError, _TriMaxError);
+            Writer.WriteLine("*** RMSE ***");
+            Writer.WriteLine("Mean: {0}cm{1}Min:  {2}cm{1}Max:  {3}cm", Math.Sqrt(_TriSquaredMeanError), Environment.NewLine, Math.Sqrt(_TriSquaredMinError), Math.Sqrt(_TriSquaredMaxError));
             Writer.Close();
         }
     }
